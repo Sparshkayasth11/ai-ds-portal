@@ -1,0 +1,673 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#f5f7fc">
+  <meta name="description" content="JNCT Bhopal CSE AI & Data Science department administration portal.">
+  <title>Faculty Portal · JNCT Bhopal AI &amp; DS</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: { ink: "#17213a", brand: "#5b62e8" },
+          fontFamily: { sans: ["DM Sans", "sans-serif"], display: ["Manrope", "sans-serif"] }
+        }
+      }
+    };
+  </script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    :root {
+      color-scheme: light;
+      --page: #f5f7fc; --surface: #fff; --surface-soft: #fafbfe; --ink: #17213a;
+      --muted: #77839a; --line: #e9edf5; --brand: #5b62e8; --sidebar: 250px;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; min-width: 320px; background: var(--page); color: var(--ink); font-family: "DM Sans", sans-serif; }
+    button, input, select, textarea { font: inherit; }
+    button { cursor: pointer; }
+    .hidden { display: none !important; }
+    .brand-emblem { position: relative; display: grid; width: 40px; height: 40px; place-items: center; overflow: hidden; border-radius: 13px; color: #fff; background: linear-gradient(145deg,#7479f5,#444bd0); box-shadow: 0 6px 15px #555de643; }
+    .brand-emblem strong { font: 800 23px/1 "Manrope",sans-serif; }
+    .brand-lockup { display: flex; align-items: center; gap: 11px; text-decoration: none; color: inherit; }
+    .brand-name { font: 800 18px/1.2 "Manrope",sans-serif; letter-spacing: -.6px; }
+    .brand-name span { color: var(--brand); }
+    .brand-subtitle { margin-top: 3px; color: #8b94a8; font-size: 8px; font-weight: 700; letter-spacing: 1.1px; }
+    .login-shell { min-height: 100vh; display: grid; place-items: center; padding: 24px; background: radial-gradient(ellipse at 80% 15%,#e9eaff 0,transparent 35%),var(--page); }
+    .login-card { width: min(100%,430px); padding: 34px; border: 1px solid var(--line); border-radius: 19px; background: var(--surface); box-shadow: 0 22px 70px #26345b12; }
+    .login-card h1 { margin: 30px 0 7px; font: 700 25px/1.2 "Manrope",sans-serif; letter-spacing: -.8px; }
+    .login-card > p { margin: 0; color: var(--muted); font-size: 12px; line-height: 1.7; }
+    .field { display: grid; gap: 7px; margin-top: 17px; color: #59667e; font-size: 11px; font-weight: 700; }
+    .field input, .field select, .field textarea { width: 100%; min-height: 42px; padding: 10px 12px; border: 1px solid #e3e8f0; border-radius: 8px; outline: 0; color: #27324a; background: var(--surface); font-size: 12px; font-weight: 400; transition: .2s ease; }
+    .field input:focus, .field select:focus, .field textarea:focus { border-color: #aeb3f3; box-shadow: 0 0 0 3px #656be910; }
+    .demo-notice { display: flex; align-items: flex-start; gap: 10px; margin-top: 18px; padding: 12px; border: 1px solid #f2e6c6; border-radius: 9px; color: #7a6740; background: #fffbef; font-size: 10px; line-height: 1.65; }
+    .demo-notice svg { width: 16px; height: 16px; flex: 0 0 auto; margin-top: 1px; color: #bd9146; }
+    .primary-button { min-height: 40px; display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 0 15px; border: 0; border-radius: 8px; color: #fff; background: var(--brand); box-shadow: 0 4px 10px #5b62e826; font-size: 11px; font-weight: 700; transition: .2s ease; }
+    .primary-button:hover { transform: translateY(-1px); background: #474ed3; }
+    .primary-button svg { width: 15px; height: 15px; }
+    .login-card .primary-button { width: 100%; margin-top: 17px; }
+    .error-message { min-height: 16px; margin: 10px 0 0; color: #bd4d54; font-size: 10px; }
+    .app { min-height: 100vh; }
+    .sidebar { position: fixed; inset: 0 auto 0 0; z-index: 5; width: var(--sidebar); display: flex; flex-direction: column; padding: 27px 16px 18px; border-right: 1px solid var(--line); background: var(--surface); }
+    .sidebar .brand-lockup { margin: 0 0 41px 7px; }
+    .sidebar-label { margin: 0 0 11px; padding: 0 11px; color: #a0a8b9; font-size: 9px; font-weight: 700; letter-spacing: 1.2px; }
+    .side-nav { display: grid; gap: 4px; }
+    .side-link { position: relative; min-height: 43px; display: flex; align-items: center; gap: 11px; padding: 0 11px; border: 0; border-radius: 9px; color: #79859b; background: transparent; text-align: left; font-size: 11px; font-weight: 600; transition: .18s ease; }
+    .side-link svg { width: 16px; height: 16px; }
+    .side-link:hover { color: var(--brand); background: #f6f7fe; }
+    .side-link.active { color: #555ce0; background: #f0f1ff; }
+    .side-link.active::after { position: absolute; top: 11px; right: 0; width: 3px; height: 21px; border-radius: 4px 0 0 4px; background: #656be9; content: ""; }
+    .sidebar-bottom { margin-top: auto; }
+    .sidebar-note { padding: 13px; border: 1px solid var(--line); border-radius: 10px; color: var(--muted); background: var(--surface-soft); font-size: 9px; line-height: 1.65; }
+    .sidebar-note strong { display: block; margin-bottom: 3px; color: var(--ink); font-size: 10px; }
+    .sidebar-foot { display: flex; align-items: center; gap: 7px; margin: 17px 4px 0; color: #929caf; font-size: 9px; }
+    .status-dot { width: 6px; height: 6px; border-radius: 50%; background: #46c99a; box-shadow: 0 0 0 3px #46c99a20; }
+    .main { min-height: 100vh; margin-left: var(--sidebar); padding: 0 38px 26px; }
+    .topbar { height: 72px; display: flex; align-items: center; justify-content: space-between; gap: 14px; border-bottom: 1px solid var(--line); }
+    .crumb { display: flex; align-items: center; gap: 9px; color: #929caf; font-size: 10px; }
+    .crumb svg { width: 13px; height: 13px; color: #b1b8c5; }
+    .crumb strong { color: #38445e; font-weight: 600; }
+    .top-actions { display: flex; align-items: center; gap: 8px; }
+    .icon-button, .outline-button { min-height: 35px; display: inline-flex; align-items: center; justify-content: center; gap: 7px; padding: 0 10px; border: 1px solid var(--line); border-radius: 8px; color: #69758b; background: var(--surface); font-size: 10px; font-weight: 600; }
+    .icon-button { width: 36px; padding: 0; }
+    .icon-button svg, .outline-button svg { width: 14px; height: 14px; }
+    .outline-button:hover, .icon-button:hover { border-color: #cfd2fa; color: var(--brand); background: #f8f8ff; }
+    .profile-chip { display: flex; align-items: center; gap: 8px; margin-left: 4px; padding-left: 12px; border-left: 1px solid var(--line); }
+    .avatar { width: 31px; height: 31px; display: grid; place-items: center; border-radius: 50%; color: #585fda; background: #eff0ff; font-size: 10px; font-weight: 700; }
+    .profile-chip strong { display: block; max-width: 120px; overflow: hidden; color: #34405a; font-size: 10px; text-overflow: ellipsis; white-space: nowrap; }
+    .profile-chip small { display: block; margin-top: 2px; color: #97a0b1; font-size: 8px; }
+    .page-content { max-width: 1400px; margin: 0 auto; padding-top: 29px; }
+    .page-heading { display: flex; align-items: flex-end; justify-content: space-between; gap: 18px; margin-bottom: 22px; }
+    .eyebrow { margin-bottom: 7px; color: #7178dc; font-size: 8px; font-weight: 700; letter-spacing: 1.35px; }
+    .page-heading h1 { margin: 0; font: 700 23px/1.3 "Manrope",sans-serif; letter-spacing: -.7px; }
+    .page-heading p { margin: 5px 0 0; color: var(--muted); font-size: 10px; }
+    .stat-grid { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 13px; margin-bottom: 19px; }
+    .stat-card { min-height: 83px; display: flex; align-items: center; gap: 12px; padding: 14px; border: 1px solid var(--line); border-radius: 11px; background: var(--surface); box-shadow: 0 5px 16px #34457505; }
+    .stat-icon { width: 36px; height: 36px; display: grid; place-items: center; border-radius: 10px; color: #6269e5; background: #f0f1ff; }
+    .stat-icon svg { width: 17px; height: 17px; }
+    .stat-label { color: #99a2b4; font-size: 8px; font-weight: 700; letter-spacing: .8px; }
+    .stat-value { margin-top: 3px; color: #26324b; font: 700 19px/1.2 "Manrope",sans-serif; }
+    .content-card { border: 1px solid var(--line); border-radius: 12px; background: var(--surface); box-shadow: 0 5px 18px #34457505; }
+    .card-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 17px 18px; border-bottom: 1px solid var(--line); }
+    .card-header h2 { margin: 0; color: #27324a; font: 700 13px/1.4 "Manrope",sans-serif; }
+    .card-header p { margin: 4px 0 0; color: #929caf; font-size: 9px; }
+    .form-body { padding: 17px 18px 18px; }
+    .form-grid { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 0 14px; }
+    .field textarea { min-height: 93px; resize: vertical; line-height: 1.6; }
+    .field-wide { grid-column: 1/-1; }
+    .form-actions { display: flex; justify-content: flex-end; margin-top: 17px; }
+    .table-wrap { overflow-x: auto; }
+    .notices-table { width: 100%; border-collapse: collapse; text-align: left; }
+    .notices-table th { padding: 11px 14px; color: #9aa3b4; background: var(--surface-soft); font-size: 8px; font-weight: 700; letter-spacing: .7px; text-transform: uppercase; white-space: nowrap; }
+    .notices-table td { padding: 13px 14px; border-top: 1px solid var(--line); color: #65728a; font-size: 10px; vertical-align: middle; }
+    .notice-title { max-width: 260px; color: #303b54; font-size: 10px; font-weight: 700; }
+    .notice-summary { max-width: 280px; overflow: hidden; margin-top: 4px; color: #929caf; font-size: 9px; text-overflow: ellipsis; white-space: nowrap; }
+    .tag { display: inline-flex; align-items: center; gap: 5px; padding: 4px 7px; border-radius: 99px; font-size: 8px; font-weight: 700; white-space: nowrap; }
+    .tag-new { color: #bd695d; background: #fff1ee; }.tag-academic { color: #5c65cf; background: #f0f1ff; }.tag-general { color: #458b70; background: #ecf8f2; }
+    .attachment-link { display: inline-flex; align-items: center; gap: 5px; color: #6269df; text-decoration: none; font-size: 9px; }
+    .attachment-link svg { width: 12px; height: 12px; }.attachment-link:hover { text-decoration: underline; }
+    .row-actions { display: flex; justify-content: flex-end; gap: 6px; }
+    .row-action { width: 28px; height: 28px; display: grid; place-items: center; border: 1px solid var(--line); border-radius: 7px; color: #738097; background: var(--surface); }
+    .row-action svg { width: 13px; height: 13px; }.row-action:hover { border-color: #d4d7f5; color: var(--brand); background: #f8f8ff; }.row-action.delete:hover { border-color: #f4d6d7; color: #c65159; background: #fff7f7; }
+    .empty-row { padding: 30px !important; color: #929caf !important; text-align: center; }
+    .message { min-height: 15px; margin: 11px 0 0; color: #888; font-size: 9px; }.message.success { color: #258264; }.message.error { color: #bd4d54; }
+    .simple-panel { padding: 21px; }
+    .simple-panel h2 { margin: 0 0 5px; color: #27324a; font: 700 14px "Manrope",sans-serif; }
+    .simple-panel > p { margin: 0; color: var(--muted); font-size: 10px; line-height: 1.7; }
+    .simple-grid { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 13px; }
+    .theme-dark { color-scheme: dark; --page: #111827; --surface: #1c2535; --surface-soft: #182131; --ink: #e6eaf2; --muted: #9ba7bb; --line: #303a4d; }
+    .theme-dark .brand-subtitle, .theme-dark .sidebar-label, .theme-dark .sidebar-foot, .theme-dark .crumb, .theme-dark .card-header p,
+    .theme-dark .stat-label, .theme-dark .notice-summary, .theme-dark .page-heading p { color: #9ba7bb; }
+    .theme-dark .side-link { color: #aeb8c9; }.theme-dark .side-link.active, .theme-dark .side-link:hover { color: #a6aaff; background: #2b3150; }
+    .theme-dark .crumb strong, .theme-dark .profile-chip strong, .theme-dark .card-header h2, .theme-dark .page-heading h1,
+    .theme-dark .stat-value, .theme-dark .notice-title, .theme-dark .simple-panel h2 { color: #e6eaf2; }
+    .theme-dark .notices-table th { color: #a8b2c3; background: #182131; }.theme-dark .notices-table td { color: #b4bed0; }
+    .theme-dark .field { color: #bbc4d4; }.theme-dark .field input, .theme-dark .field select, .theme-dark .field textarea { color: #e6eaf2; }
+    .theme-dark .outline-button, .theme-dark .icon-button, .theme-dark .row-action { color: #c0c9d8; }
+    .theme-dark .login-shell { background: radial-gradient(ellipse at 80% 15%,#292d52 0,transparent 35%),var(--page); }
+    .theme-dark .login-card h1 { color: #e6eaf2; }.theme-dark .login-card > p { color: #aab5c7; }
+    @media (max-width: 1000px) { :root { --sidebar: 220px; }.main { padding-right: 23px; padding-left: 23px; }.stat-grid { gap: 9px; } }
+    @media (max-width: 760px) {
+      :root { --sidebar: 0px; }
+      .sidebar { position: static; width: auto; padding: 12px 15px; border-right: 0; border-bottom: 1px solid var(--line); }
+      .sidebar .brand-lockup { margin: 0; }.sidebar .brand-emblem { width: 34px; height: 34px; }
+      .sidebar-label, .sidebar-bottom { display: none; }
+      .side-nav { display: flex; gap: 5px; margin-top: 12px; overflow-x: auto; }
+      .side-link { min-height: 36px; flex: 0 0 auto; padding: 0 9px; font-size: 9px; }.side-link svg { width: 14px; height: 14px; }
+      .side-link.active::after { top: auto; right: 9px; bottom: 0; left: 9px; width: auto; height: 2px; border-radius: 3px 3px 0 0; }
+      .main { margin-left: 0; padding: 0 15px 20px; }.topbar { height: 59px; }.page-content { padding-top: 22px; }
+      .profile-chip { padding-left: 8px; }.profile-chip > div:last-child { display: none; }
+      .stat-grid { grid-template-columns: 1fr; }.stat-card { min-height: 66px; }
+      .page-heading { align-items: flex-start; flex-direction: column; }
+    }
+    @media (max-width: 520px) {
+      .login-card { padding: 24px 20px; }.main { padding-right: 12px; padding-left: 12px; }
+      .top-actions .outline-button span { display: none; }.top-actions .outline-button { width: 35px; padding: 0; }
+      .crumb { display: none; }.topbar { justify-content: flex-end; }
+      .form-grid, .simple-grid { grid-template-columns: 1fr; }.field-wide { grid-column: auto; }
+      .card-header, .form-body { padding-right: 13px; padding-left: 13px; }.card-header { align-items: flex-start; }
+      .notices-table th, .notices-table td { padding-right: 10px; padding-left: 10px; }
+    }
+    @media (prefers-reduced-motion: reduce) { *,*::before,*::after { scroll-behavior: auto !important; transition-duration: .01ms !important; animation-duration: .01ms !important; } }
+  </style>
+</head>
+<body>
+  <section id="login-view" class="login-shell">
+    <div class="login-card">
+      <a class="brand-lockup" href="index.html">
+        <span class="brand-emblem"><strong>J</strong></span>
+        <span><span class="brand-name">JNCT<span>.</span></span><span class="brand-subtitle">BHOPAL · AI &amp; DS</span></span>
+      </a>
+      <h1>Faculty portal</h1>
+      <p>Sign in to manage department notices and academic resources.</p>
+      <form id="login-form">
+        <label class="field">Employee ID
+          <input name="employeeId" autocomplete="username" placeholder="Enter your employee ID" required>
+        </label>
+        <label class="field">Password
+          <input name="password" type="password" autocomplete="current-password" placeholder="Enter your password" required>
+        </label>
+        <p id="login-error" class="error-message" aria-live="polite"></p>
+        <button class="primary-button" type="submit">Continue to portal <i data-lucide="arrow-right"></i></button>
+      </form>
+      <div class="demo-notice"><i data-lucide="shield-alert"></i><span><strong>Static demo only.</strong> There is no authentication backend; the form accepts non-empty fields for preview only. Credentials are not checked or stored. Do not use this page to protect real admin access.</span></div>
+    </div>
+  </section>
+
+  <div id="admin-app" class="app hidden">
+    <aside class="sidebar">
+      <a class="brand-lockup" href="index.html">
+        <span class="brand-emblem"><strong>J</strong></span>
+        <span><span class="brand-name">JNCT<span>.</span></span><span class="brand-subtitle">BHOPAL · AI &amp; DS</span></span>
+      </a>
+      <div class="sidebar-label">FACULTY WORKSPACE</div>
+      <nav class="side-nav" aria-label="Admin sections">
+        <button class="side-link active" type="button" data-section="announcements"><i data-lucide="megaphone"></i>Manage Announcements</button>
+        <button class="side-link" type="button" data-section="timetable"><i data-lucide="calendar-clock"></i>Update Timetable</button>
+        <button class="side-link" type="button" data-section="projects"><i data-lucide="folder-kanban"></i>Project Submissions</button>
+        <button class="side-link" type="button" data-section="analytics"><i data-lucide="chart-no-axes-combined"></i>Department Analytics</button>
+      </nav>
+      <div class="sidebar-bottom">
+        <div class="sidebar-note"><strong>Local preview workspace</strong>Notices are stored in this browser and are visible to the student dashboard in the same browser profile.</div>
+        <div class="sidebar-foot"><span class="status-dot"></span> Portal preview <span style="margin-left:auto">2025–26</span></div>
+      </div>
+    </aside>
+
+    <main class="main">
+      <header class="topbar">
+        <div class="crumb"><span>Faculty workspace</span><i data-lucide="chevron-right"></i><strong id="breadcrumb-current">Manage announcements</strong></div>
+        <div class="top-actions">
+          <a class="outline-button" href="index.html" aria-label="Open student dashboard"><i data-lucide="external-link"></i><span>Student dashboard</span></a>
+          <button id="theme-toggle" class="icon-button" type="button" aria-label="Toggle dark theme"><i data-lucide="moon"></i></button>
+          <div class="profile-chip"><span id="profile-avatar" class="avatar">FA</span><div><strong id="profile-name">Faculty</strong><small>Faculty preview</small></div></div>
+          <button id="logout-button" class="outline-button" type="button" aria-label="Sign out"><i data-lucide="log-out"></i><span>Sign out</span></button>
+        </div>
+      </header>
+
+      <div class="page-content">
+        <section class="page-section" data-view="announcements">
+          <div class="page-heading">
+            <div><div class="eyebrow">DEPARTMENT WORKSPACE</div><h1>Manage announcements</h1><p>Create and manage circulars for CSE · AI &amp; Data Science.</p></div>
+            <span class="tag tag-academic"><i data-lucide="radio"></i><span id="live-count">0 notices</span></span>
+          </div>
+          <div class="stat-grid">
+            <article class="stat-card"><span class="stat-icon"><i data-lucide="megaphone"></i></span><div><div class="stat-label">ACTIVE NOTICES</div><div id="stat-notices" class="stat-value">0</div></div></article>
+            <article class="stat-card"><span class="stat-icon" style="color:#35a7bd;background:#eaf8fb"><i data-lucide="calendar-days"></i></span><div><div class="stat-label">THIS MONTH</div><div id="stat-month" class="stat-value">0</div></div></article>
+            <article class="stat-card"><span class="stat-icon" style="color:#3fa977;background:#edfaf3"><i data-lucide="paperclip"></i></span><div><div class="stat-label">WITH ATTACHMENTS</div><div id="stat-links" class="stat-value">0</div></div></article>
+          </div>
+          <section class="content-card">
+            <div class="card-header"><div><h2 id="form-heading">Quick action · Add a notice</h2><p>New notices appear in the student dashboard in this browser immediately.</p></div><button id="cancel-edit" class="outline-button hidden" type="button"><i data-lucide="x"></i><span>Cancel edit</span></button></div>
+            <form id="notice-form" class="form-body">
+              <input type="hidden" name="id">
+              <div class="form-grid">
+                <label class="field field-wide">Notice title<input name="title" maxlength="100" placeholder="e.g. Mid-semester examination schedule" required></label>
+                <label class="field">Category tag
+                  <select name="category"><option value="New">New</option><option value="Academic">Academic</option><option value="General">General</option></select>
+                </label>
+                <label class="field">Date<input name="date" type="date" required></label>
+                <label class="field field-wide">Notice details<textarea name="body" maxlength="1000" placeholder="Write the circular or notice details..." required></textarea></label>
+                <label class="field field-wide">Attachment / Drive link <span style="font-weight:400;color:#929caf">(optional)</span><input name="link" type="url" placeholder="https://drive.google.com/..."></label>
+              </div>
+              <p id="form-message" class="message" aria-live="polite"></p>
+              <div class="form-actions"><button class="primary-button" type="submit"><i data-lucide="send"></i><span id="submit-label">Publish notice</span></button></div>
+            </form>
+          </section>
+          <section class="content-card" style="margin-top:15px">
+            <div class="card-header"><div><h2>Active notices</h2><p>Use Edit to update a notice or Delete to remove it from the student dashboard.</p></div></div>
+            <div class="table-wrap">
+              <table class="notices-table">
+                <thead><tr><th>Notice</th><th>Category</th><th>Date</th><th>Attachment</th><th style="text-align:right">Actions</th></tr></thead>
+                <tbody id="notice-rows"></tbody>
+              </table>
+            </div>
+          </section>
+        </section>
+
+        <section class="page-section hidden" data-view="timetable">
+          <div class="page-heading"><div><div class="eyebrow">ACADEMIC SCHEDULE</div><h1>Update timetable</h1><p>Keep a reference to the current schedule resource for the department.</p></div></div>
+          <section class="content-card">
+            <div class="card-header"><div><h2>Timetable resource</h2><p>Saved in this browser as a local preview setting.</p></div></div>
+            <form id="timetable-form" class="form-body">
+              <div class="form-grid">
+                <label class="field">Semester<select name="semester"><option>3rd Semester</option><option>5th Semester</option><option>7th Semester</option></select></label>
+                <label class="field">Last updated<input name="date" type="date" required></label>
+                <label class="field field-wide">Timetable / Drive link<input name="link" type="url" placeholder="https://drive.google.com/..." required></label>
+              </div>
+              <p id="timetable-message" class="message" aria-live="polite"></p>
+              <div class="form-actions"><button class="primary-button" type="submit"><i data-lucide="save"></i>Save timetable reference</button></div>
+            </form>
+          </section>
+        </section>
+
+        <section class="page-section hidden" data-view="projects">
+          <div class="page-heading"><div><div class="eyebrow">STUDENT WORK</div><h1>Project submissions</h1><p>Review project drafts saved in this browser profile.</p></div></div>
+          <section class="content-card">
+            <div class="card-header"><div><h2>Project drafts</h2><p>These entries are local demo drafts, not centrally submitted student work.</p></div></div>
+            <div id="project-drafts" class="simple-grid" style="padding:17px"></div>
+          </section>
+        </section>
+
+        <section class="page-section hidden" data-view="analytics">
+          <div class="page-heading"><div><div class="eyebrow">DEPARTMENT OVERVIEW</div><h1>Department analytics</h1><p>A quick summary of the local portal preview data.</p></div></div>
+          <div class="stat-grid">
+            <article class="stat-card"><span class="stat-icon"><i data-lucide="megaphone"></i></span><div><div class="stat-label">TOTAL NOTICES</div><div id="analytics-notices" class="stat-value">0</div></div></article>
+            <article class="stat-card"><span class="stat-icon" style="color:#35a7bd;background:#eaf8fb"><i data-lucide="folder-kanban"></i></span><div><div class="stat-label">PROJECT DRAFTS</div><div id="analytics-projects" class="stat-value">0</div></div></article>
+            <article class="stat-card"><span class="stat-icon" style="color:#3fa977;background:#edfaf3"><i data-lucide="paperclip"></i></span><div><div class="stat-label">LINKED RESOURCES</div><div id="analytics-links" class="stat-value">0</div></div></article>
+          </div>
+          <section class="content-card simple-panel"><h2>About these numbers</h2><p>Analytics are calculated from notices and project drafts stored in this browser. This preview is not connected to a department server and does not combine data across users or devices.</p></section>
+        </section>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    (() => {
+      const noticeKey = "jnct-ai-ds-announcements";
+      const projectKey = "jnct-ai-ds-project-drafts";
+      const timetableKey = "jnct-ai-ds-timetable";
+      const themeKey = "jnct-ai-ds-admin-theme";
+      const loginView = document.querySelector("#login-view");
+      const app = document.querySelector("#admin-app");
+      const noticeForm = document.querySelector("#notice-form");
+      const noticeRows = document.querySelector("#notice-rows");
+      const formMessage = document.querySelector("#form-message");
+      let notices = [];
+      let editorName = "";
+      let storageWarning = "";
+
+      function iconRefresh() {
+        if (window.lucide) window.lucide.createIcons();
+      }
+
+      function readJson(key, fallback) {
+        try {
+          const value = JSON.parse(localStorage.getItem(key) || JSON.stringify(fallback));
+          return value;
+        } catch {
+          storageWarning = "Saved browser data could not be read. Check storage settings or clear invalid local data.";
+          return fallback;
+        }
+      }
+
+      function readNotices() {
+        const value = readJson(noticeKey, []);
+        if (!Array.isArray(value)) {
+          storageWarning = "Saved announcements have an invalid format and could not be shown.";
+          return [];
+        }
+        return value.filter((item) => item && typeof item.title === "string" && typeof item.body === "string")
+          .map((item) => ({
+            id: typeof item.id === "string" ? item.id : `${Date.now()}-${Math.random()}`,
+            title: item.title.slice(0, 100),
+            body: item.body.slice(0, 1000),
+            author: typeof item.author === "string" ? item.author : "Department",
+            createdAt: typeof item.createdAt === "string" ? item.createdAt : new Date().toISOString(),
+            category: ["New", "Academic", "General"].includes(item.category) ? item.category : "General",
+            date: typeof item.date === "string" ? item.date : (item.createdAt || new Date().toISOString()).slice(0, 10),
+            link: safeUrl(item.link) ? item.link : ""
+          }));
+      }
+
+      function safeUrl(value) {
+        if (typeof value !== "string" || !value.trim()) return false;
+        try {
+          const url = new URL(value);
+          return url.protocol === "https:" || url.protocol === "http:";
+        } catch {
+          return false;
+        }
+      }
+
+      function localDateValue(date = new Date()) {
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, "0");
+        const day = String(date.getDate()).padStart(2, "0");
+        return `${year}-${month}-${day}`;
+      }
+
+      function prettyDate(value) {
+        const date = new Date(`${value}T00:00:00`);
+        return Number.isNaN(date.getTime()) ? "—" : new Intl.DateTimeFormat(undefined, { dateStyle: "medium" }).format(date);
+      }
+
+      function escapeText(value) {
+        return String(value ?? "");
+      }
+
+      function updateMetrics() {
+        const count = notices.length;
+        const now = new Date();
+        const monthCount = notices.filter((notice) => {
+          const date = new Date(`${notice.date}T00:00:00`);
+          return date.getMonth() === now.getMonth() && date.getFullYear() === now.getFullYear();
+        }).length;
+        const linkCount = notices.filter((notice) => notice.link).length;
+        document.querySelector("#live-count").textContent = `${count} ${count === 1 ? "notice" : "notices"}`;
+        document.querySelector("#stat-notices").textContent = String(count);
+        document.querySelector("#stat-month").textContent = String(monthCount);
+        document.querySelector("#stat-links").textContent = String(linkCount);
+        document.querySelector("#analytics-notices").textContent = String(count);
+        document.querySelector("#analytics-links").textContent = String(linkCount);
+      }
+
+      function renderNotices() {
+        notices = readNotices();
+        noticeRows.replaceChildren();
+        if (storageWarning) {
+          formMessage.className = "message error";
+          formMessage.textContent = storageWarning;
+        }
+        if (!notices.length) {
+          const row = document.createElement("tr");
+          const cell = document.createElement("td");
+          cell.colSpan = 5;
+          cell.className = "empty-row";
+          cell.textContent = "No notices published yet. Use the form above to add the first one.";
+          row.append(cell);
+          noticeRows.append(row);
+        }
+
+        notices.forEach((notice) => {
+          const row = document.createElement("tr");
+          const titleCell = document.createElement("td");
+          const title = document.createElement("div");
+          title.className = "notice-title";
+          title.textContent = escapeText(notice.title);
+          const summary = document.createElement("div");
+          summary.className = "notice-summary";
+          summary.textContent = escapeText(notice.body);
+          titleCell.append(title, summary);
+
+          const categoryCell = document.createElement("td");
+          const category = document.createElement("span");
+          category.className = `tag tag-${notice.category.toLowerCase()}`;
+          category.textContent = notice.category;
+          categoryCell.append(category);
+
+          const dateCell = document.createElement("td");
+          dateCell.textContent = prettyDate(notice.date);
+          const linkCell = document.createElement("td");
+          if (notice.link) {
+            const link = document.createElement("a");
+            link.className = "attachment-link";
+            link.href = notice.link;
+            link.target = "_blank";
+            link.rel = "noopener noreferrer";
+            const icon = document.createElement("i");
+            icon.dataset.lucide = "external-link";
+            link.append(icon, document.createTextNode("Open link"));
+            linkCell.append(link);
+          } else {
+            linkCell.textContent = "—";
+          }
+
+          const actionsCell = document.createElement("td");
+          const actions = document.createElement("div");
+          actions.className = "row-actions";
+          const edit = document.createElement("button");
+          edit.type = "button";
+          edit.className = "row-action";
+          edit.setAttribute("aria-label", `Edit ${notice.title}`);
+          edit.dataset.editId = notice.id;
+          const editIcon = document.createElement("i");
+          editIcon.dataset.lucide = "pencil";
+          edit.append(editIcon);
+          const remove = document.createElement("button");
+          remove.type = "button";
+          remove.className = "row-action delete";
+          remove.setAttribute("aria-label", `Delete ${notice.title}`);
+          remove.dataset.deleteId = notice.id;
+          const removeIcon = document.createElement("i");
+          removeIcon.dataset.lucide = "trash-2";
+          remove.append(removeIcon);
+          actions.append(edit, remove);
+          actionsCell.append(actions);
+          row.append(titleCell, categoryCell, dateCell, linkCell, actionsCell);
+          noticeRows.append(row);
+        });
+        updateMetrics();
+        renderProjectDrafts();
+        iconRefresh();
+      }
+
+      function resetNoticeForm() {
+        noticeForm.reset();
+        noticeForm.elements.id.value = "";
+        noticeForm.elements.date.value = localDateValue();
+        document.querySelector("#form-heading").textContent = "Quick action · Add a notice";
+        document.querySelector("#submit-label").textContent = "Publish notice";
+        document.querySelector("#cancel-edit").classList.add("hidden");
+      }
+
+      function persistNotices(nextNotices) {
+        try {
+          localStorage.setItem(noticeKey, JSON.stringify(nextNotices));
+          notices = nextNotices;
+          renderNotices();
+          formMessage.className = "message success";
+          formMessage.textContent = "Notice saved. The student dashboard in this browser is updated immediately.";
+          return true;
+        } catch {
+          formMessage.className = "message error";
+          formMessage.textContent = "Could not save this notice. Check browser storage settings and try again.";
+          return false;
+        }
+      }
+
+      function editNotice(id) {
+        const notice = notices.find((item) => item.id === id);
+        if (!notice) return;
+        noticeForm.elements.id.value = notice.id;
+        noticeForm.elements.title.value = notice.title;
+        noticeForm.elements.category.value = notice.category;
+        noticeForm.elements.date.value = notice.date;
+        noticeForm.elements.body.value = notice.body;
+        noticeForm.elements.link.value = notice.link || "";
+        document.querySelector("#form-heading").textContent = "Edit department notice";
+        document.querySelector("#submit-label").textContent = "Save changes";
+        document.querySelector("#cancel-edit").classList.remove("hidden");
+        noticeForm.scrollIntoView({ behavior: "smooth", block: "start" });
+        noticeForm.elements.title.focus();
+      }
+
+      function renderProjectDrafts() {
+        const container = document.querySelector("#project-drafts");
+        const drafts = readJson(projectKey, {});
+        if (!drafts || typeof drafts !== "object" || Array.isArray(drafts)) {
+          container.textContent = "No project drafts found in this browser.";
+          document.querySelector("#analytics-projects").textContent = "0";
+          return;
+        }
+        const types = ["minor", "major"].filter((type) => drafts[type] && typeof drafts[type] === "object");
+        document.querySelector("#analytics-projects").textContent = String(types.length);
+        container.replaceChildren();
+        if (!types.length) {
+          container.textContent = "No project drafts found in this browser.";
+          return;
+        }
+        types.forEach((type) => {
+          const draft = drafts[type];
+          const card = document.createElement("article");
+          card.className = "content-card simple-panel";
+          const heading = document.createElement("h2");
+          heading.textContent = `${type === "minor" ? "Minor" : "Major"} project`;
+          const details = document.createElement("p");
+          const team = Array.isArray(draft.members) ? draft.members.filter(Boolean).join(", ") : "No team members entered";
+          details.textContent = `${draft.title || "Untitled draft"} · ${draft.status || "Status not set"} · Guide: ${draft.guide || "Not entered"} · Team: ${team || "Not entered"}`;
+          card.append(heading, details);
+          if (safeUrl(draft.repository)) {
+            const link = document.createElement("a");
+            link.href = draft.repository;
+            link.target = "_blank";
+            link.rel = "noopener noreferrer";
+            link.className = "attachment-link";
+            link.textContent = "Open repository";
+            card.append(link);
+          }
+          container.append(card);
+        });
+      }
+
+      function showSection(section) {
+        document.querySelectorAll("[data-view]").forEach((view) => view.classList.toggle("hidden", view.dataset.view !== section));
+        document.querySelectorAll("[data-section]").forEach((button) => button.classList.toggle("active", button.dataset.section === section));
+        const labels = { announcements: "Manage announcements", timetable: "Update timetable", projects: "Project submissions", analytics: "Department analytics" };
+        document.querySelector("#breadcrumb-current").textContent = labels[section] || labels.announcements;
+      }
+
+      function enterPortal(name) {
+        editorName = name;
+        loginView.classList.add("hidden");
+        app.classList.remove("hidden");
+        document.querySelector("#profile-name").textContent = name;
+        document.querySelector("#profile-avatar").textContent = name.split(/\s+/).map((part) => part[0]).join("").slice(0, 2).toUpperCase();
+        renderNotices();
+        showSection("announcements");
+      }
+
+      document.querySelector("#login-form").addEventListener("submit", (event) => {
+        event.preventDefault();
+        const form = event.currentTarget;
+        const employeeId = form.elements.employeeId.value.trim();
+        const password = form.elements.password.value;
+        if (!employeeId || !password) {
+          document.querySelector("#login-error").textContent = "Enter an Employee ID and password to continue.";
+          return;
+        }
+        document.querySelector("#login-error").textContent = "";
+        form.elements.password.value = "";
+        enterPortal(employeeId);
+      });
+
+      noticeForm.elements.date.value = localDateValue();
+      noticeForm.addEventListener("submit", (event) => {
+        event.preventDefault();
+        const data = new FormData(noticeForm);
+        const title = data.get("title").trim();
+        const body = data.get("body").trim();
+        const link = data.get("link").trim();
+        if (!title || !body) return;
+        if (link && !safeUrl(link)) {
+          formMessage.className = "message error";
+          formMessage.textContent = "Enter a valid http:// or https:// attachment link.";
+          return;
+        }
+        const existingId = data.get("id");
+        const previous = notices.find((item) => item.id === existingId);
+        const notice = {
+          id: existingId || (typeof crypto !== "undefined" && crypto.randomUUID ? crypto.randomUUID() : `${Date.now()}-${Math.random()}`),
+          title,
+          body,
+          category: data.get("category"),
+          date: data.get("date"),
+          link,
+          author: editorName || "Faculty",
+          createdAt: previous?.createdAt || new Date().toISOString()
+        };
+        const next = existingId
+          ? notices.map((item) => item.id === existingId ? notice : item)
+          : [notice, ...notices];
+        if (persistNotices(next)) resetNoticeForm();
+      });
+
+      document.querySelector("#cancel-edit").addEventListener("click", () => {
+        resetNoticeForm();
+        formMessage.className = "message";
+        formMessage.textContent = "";
+      });
+
+      noticeRows.addEventListener("click", (event) => {
+        const edit = event.target.closest("[data-edit-id]");
+        if (edit) {
+          editNotice(edit.dataset.editId);
+          return;
+        }
+        const remove = event.target.closest("[data-delete-id]");
+        if (!remove) return;
+        const notice = notices.find((item) => item.id === remove.dataset.deleteId);
+        if (!notice || !window.confirm(`Delete "${notice.title}"? This also removes it from the student dashboard.`)) return;
+        if (noticeForm.elements.id.value === notice.id) resetNoticeForm();
+        persistNotices(notices.filter((item) => item.id !== notice.id));
+        formMessage.textContent = "Notice deleted.";
+      });
+
+      document.querySelectorAll("[data-section]").forEach((button) => {
+        button.addEventListener("click", () => showSection(button.dataset.section));
+      });
+
+      document.querySelector("#theme-toggle").addEventListener("click", () => {
+        document.body.classList.toggle("theme-dark");
+        const dark = document.body.classList.contains("theme-dark");
+        try { localStorage.setItem(themeKey, dark ? "dark" : "light"); } catch { /* Theme remains active until refresh. */ }
+        document.querySelector("#theme-toggle").innerHTML = `<i data-lucide="${dark ? "sun" : "moon"}"></i>`;
+        iconRefresh();
+      });
+
+      document.querySelector("#logout-button").addEventListener("click", () => {
+        app.classList.add("hidden");
+        loginView.classList.remove("hidden");
+        document.querySelector("#login-form").reset();
+        document.querySelector("#login-error").textContent = "";
+        editorName = "";
+      });
+
+      document.querySelector("#timetable-form").addEventListener("submit", (event) => {
+        event.preventDefault();
+        const form = event.currentTarget;
+        const data = new FormData(form);
+        if (!safeUrl(data.get("link"))) {
+          document.querySelector("#timetable-message").className = "message error";
+          document.querySelector("#timetable-message").textContent = "Enter a valid http:// or https:// timetable link.";
+          return;
+        }
+        try {
+          localStorage.setItem(timetableKey, JSON.stringify({ semester: data.get("semester"), date: data.get("date"), link: data.get("link") }));
+          document.querySelector("#timetable-message").className = "message success";
+          document.querySelector("#timetable-message").textContent = "Timetable reference saved in this browser.";
+        } catch {
+          document.querySelector("#timetable-message").className = "message error";
+          document.querySelector("#timetable-message").textContent = "Could not save timetable. Check browser storage settings.";
+        }
+      });
+
+      window.addEventListener("storage", (event) => {
+        if (event.key === noticeKey && !app.classList.contains("hidden")) renderNotices();
+      });
+
+      try {
+        if (localStorage.getItem(themeKey) === "dark") {
+          document.body.classList.add("theme-dark");
+          document.querySelector("#theme-toggle").innerHTML = '<i data-lucide="sun"></i>';
+        }
+      } catch { /* Keep the default light theme when storage is unavailable. */ }
+
+      iconRefresh();
+    })();
+  </script>
+</body>
+</html>
