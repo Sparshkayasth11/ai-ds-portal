@@ -5,6 +5,44 @@ const modalContent = document.querySelector("#modal-content");
 const modalDone = document.querySelector("#modal-done");
 const modalClose = modal.querySelector(".modal-close");
 const modalPanel = modal.querySelector(".modal-panel");
+const sidebar = document.querySelector("#main-sidebar");
+const mobileNavToggle = document.querySelector("#mobile-nav-toggle");
+const aiToggleButton = document.querySelector("#ai-toggle-btn");
+const aiChatWindow = document.querySelector("#ai-chat-window");
+const aiChatMessages = document.querySelector("#ai-chat-messages");
+const aiChatForm = document.querySelector("#ai-chat-form");
+const aiUserInput = document.querySelector("#chatInput, #ai-user-input");
+const micButton = document.querySelector("#micBtn");
+const aiVoiceToggle = document.querySelector("#ai-voice-toggle");
+const aiSendButton = document.querySelector("#ai-send-btn");
+let aiVoiceEnabled = true;
+const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+let speechRecognition = null;
+let isListening = false;
+if (SpeechRecognition && micButton) {
+  speechRecognition = new SpeechRecognition();
+  speechRecognition.lang = "hi-IN";
+  speechRecognition.interimResults = false;
+  speechRecognition.maxAlternatives = 1;
+  speechRecognition.onresult = (event) => {
+    const transcript = event.results[0][0].transcript;
+    aiUserInput.value = transcript;
+    void sendAiMessage();
+  };
+  speechRecognition.onend = () => {
+    isListening = false;
+    micButton.classList.remove("listening");
+  };
+  speechRecognition.onerror = (event) => {
+    console.error("Speech recognition failed.", event.error);
+    isListening = false;
+    micButton.classList.remove("listening");
+  };
+} else if (micButton) {
+  micButton.disabled = true;
+  micButton.title = "Voice input is not supported in this browser";
+  micButton.setAttribute("aria-label", "Voice input is not supported in this browser");
+}
 const searchInput = document.querySelector("#dashboard-search");
 const cards = [...document.querySelectorAll(".dashboard-card")];
 const filterTabs = [...document.querySelectorAll(".filter-tab")];
@@ -272,10 +310,17 @@ function renderAnnouncementDashboard() {
   if (!count) {
     announcementPreview.textContent = "Stay in the loop with the latest department updates and circulars.";
     announcementUpdated.textContent = "No announcements yet";
+    announcementCard.dataset.announcementTitle = "";
+    announcementCard.dataset.announcementDate = "";
+    announcementCard.dataset.announcementDescription = "";
   } else {
     const latest = announcements[0];
     announcementPreview.textContent = latest.title;
-    announcementUpdated.textContent = `Posted ${formatAnnouncementDate(latest.date || latest.createdAt)}`;
+    const date = formatAnnouncementDate(latest.date || latest.createdAt);
+    announcementUpdated.textContent = `Posted ${date}`;
+    announcementCard.dataset.announcementTitle = latest.title || "";
+    announcementCard.dataset.announcementDate = date;
+    announcementCard.dataset.announcementDescription = latest.body || "";
   }
 
   announcementCard.dataset.search = `announcements notices circulars latest news updates ${announcements.map(({ title, body }) => `${title} ${body}`).join(" ")}`;
@@ -1549,6 +1594,215 @@ function refreshIcons() {
   if (window.lucide) window.lucide.createIcons();
 }
 
+function toggleAiChat() {
+  const isOpening = aiChatWindow.hidden;
+  aiChatWindow.hidden = !isOpening;
+  aiToggleButton.hidden = isOpening;
+  aiToggleButton.setAttribute("aria-expanded", String(isOpening));
+  if (isOpening) aiUserInput.focus();
+}
+
+function appendAiMessage(text, role, isError = false) {
+  const message = document.createElement("div");
+  message.className = `ai-chat-message ai-chat-message--${role}${isError ? " ai-chat-message--error" : ""}`;
+  message.textContent = text;
+  aiChatMessages.append(message);
+  aiChatMessages.scrollTop = aiChatMessages.scrollHeight;
+  return message;
+}
+
+function speakText(text) {
+  if (
+    !aiVoiceEnabled
+    || !("speechSynthesis" in window)
+    || typeof window.SpeechSynthesisUtterance !== "function"
+  ) return;
+
+  const cleanText = text
+    .replace(/[*_`#~>|]/g, " ")
+    .replace(/[^\p{L}\p{N}\s.,!?;:।-]/gu, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+  if (!cleanText) return;
+
+  try {
+    window.speechSynthesis.cancel();
+    const utterance = new window.SpeechSynthesisUtterance(cleanText);
+    utterance.lang = "hi-IN";
+    utterance.pitch = 1.0;
+    utterance.rate = 1.0;
+    window.speechSynthesis.speak(utterance);
+  } catch (error) {
+    console.error("Could not speak assistant response.", error);
+  }
+}
+
+function normalizeNoticeText(value) {
+  return value.toLowerCase().replace(/[^a-z0-9\u0900-\u097f]+/g, " ").trim();
+}
+
+function getDepartmentNoticeQueryCategory(query) {
+  const normalizedQuery = normalizeNoticeText(query);
+  if (/\b(mid|sem|midsem|exam|timetable|schedule)\b|time\s+table|टाइम\s*टेबल|टाइमटेबल|एग्जाम|परीक्षा|मिड\s*सेम/i.test(normalizedQuery)) return "midSem";
+  if (/\b(minor|project|proect|submission)\b|प्रोजेक्ट/i.test(normalizedQuery)) return "minorProject";
+  if (/\b(notice|announcement|annoucemnt|update|naya|latest|date)\b|\bkya\s+hai\b|नोटिस|अनाउंसमेंट/i.test(normalizedQuery)) return "latest";
+  return "";
+}
+
+function getNoticeFromDOM(query) {
+  const noOfficialNoticeReply = "Abhi iska koi official notice available nahi hai. Portal check karte rahein!";
+  const normalize = normalizeNoticeText;
+  const queryCategory = getDepartmentNoticeQueryCategory(query);
+  if (!queryCategory) return "";
+
+  const selectors = [
+    ".announcement-item",
+    ".announcement-card",
+    "[data-announcement-card]",
+    "[data-notice-card]",
+    ".card-announcements",
+    ".announcement-list > article",
+    '[class*="notice" i] article',
+    '[class*="announcement" i] article'
+  ];
+  const noticeCards = new Set(document.querySelectorAll(selectors.join(", ")));
+
+  document.querySelectorAll(
+    "#modal-content h1, #modal-content h2, #modal-content h3, " +
+    '[id*="notice" i] h1, [id*="notice" i] h2, [id*="notice" i] h3, ' +
+    '[class*="notice" i] h1, [class*="notice" i] h2, [class*="notice" i] h3, ' +
+    '[id*="announcement" i] h1, [id*="announcement" i] h2, [id*="announcement" i] h3, ' +
+    '[class*="announcement" i] h1, [class*="announcement" i] h2, [class*="announcement" i] h3'
+  ).forEach((heading) => {
+    const card = heading.closest(selectors.join(", "));
+    if (card) {
+      noticeCards.add(card);
+    } else if (heading.closest("#modal-content")) {
+      noticeCards.add(heading.parentElement);
+    }
+  });
+
+  const allNotices = [];
+  document.querySelectorAll(selectors.join(", ")).forEach((card) => noticeCards.add(card));
+  noticeCards.forEach((card) => {
+    if (!card) return;
+    const isDashboardCard = card.matches(".card-announcements");
+    const title = isDashboardCard
+      ? card.dataset.announcementTitle || ""
+      : card.dataset.announcementTitle
+        || card.dataset.noticeTitle
+        || card.querySelector("h1, h2, h3, [data-announcement-title], [data-notice-title]")?.textContent.trim()
+        || "";
+    const date = isDashboardCard
+      ? card.dataset.announcementDate || ""
+      : card.dataset.announcementDate
+        || card.dataset.noticeDate
+        || card.querySelector("time, .announcement-item-meta span, [data-announcement-date], [data-notice-date]")?.textContent.trim()
+        || "";
+    const description = isDashboardCard
+      ? card.dataset.announcementDescription || ""
+      : card.dataset.announcementDescription
+        || card.dataset.noticeDescription
+        || card.querySelector(".announcement-item > p, [data-announcement-description], [data-notice-description], p")?.textContent.trim()
+        || "";
+    const text = isDashboardCard
+      ? normalize(`${title} ${description}`)
+      : normalize(card.innerText || card.textContent || "");
+    if (title || description) {
+      allNotices.push({ title, date, description, text, isDashboardCard });
+    }
+  });
+
+  let notices = allNotices;
+  if (allNotices.some((notice) => !notice.isDashboardCard)) {
+    notices = allNotices.filter((notice) => !notice.isDashboardCard);
+  }
+  const seenNotices = new Set();
+  notices = notices.filter((notice) => {
+    const key = `${notice.date}|${notice.title}|${notice.description}`;
+    if (seenNotices.has(key)) return false;
+    seenNotices.add(key);
+    return true;
+  });
+
+  if (!notices.length) return noOfficialNoticeReply;
+
+  if (queryCategory === "latest") {
+    const summaries = notices.map((notice) => {
+      const heading = [notice.date, notice.title].filter(Boolean).join(" : ");
+      const summary = notice.description
+        ? `${heading}${heading ? " - " : ""}${notice.description}`
+        : heading;
+      return `- ${summary}`;
+    });
+    return `Portal par yeh naye announcements available hain:\n${summaries.join("\n")}`;
+  }
+
+  const noticeRegex = queryCategory === "midSem"
+    ? /mid\s*sem|timetable|schedule|exam|टाइम\s*टेबल|टाइमटेबल|एग्जाम|परीक्षा|मिड\s*सेम/i
+    : /minor\s+project|प्रोजेक्ट/i;
+  const matchingNotice = notices.find((notice) => {
+    const noticeText = normalize(`${notice.title} ${notice.description} ${notice.text}`);
+    return noticeRegex.test(noticeText);
+  });
+
+  if (!matchingNotice) return noOfficialNoticeReply;
+  return [
+    matchingNotice.date,
+    matchingNotice.title,
+    matchingNotice.description
+  ].filter(Boolean).join("\n");
+}
+
+async function sendAiMessage() {
+  const noOfficialUpdateReply = "Abhi iska koi official notice available nahi hai. Portal check karte rahein!";
+  const query = aiUserInput.value.trim();
+  if (!query || aiSendButton.disabled) return;
+  const lowerQuery = query.toLowerCase().trim();
+
+  appendAiMessage(query, "user");
+  aiUserInput.value = "";
+  aiUserInput.disabled = true;
+  aiSendButton.disabled = true;
+
+  const loadingId = `loading-${Date.now()}`;
+  const loadingMessage = appendAiMessage("Thinking...", "assistant");
+  loadingMessage.id = loadingId;
+  loadingMessage.classList.add("ai-chat-message--loading");
+
+  let botResponse = "";
+  try {
+    if (/project\s*tracker|tracker|projects|minor\s*project/i.test(lowerQuery)) {
+      botResponse = "Aap 'Project Tracker' card par click karke apne minor/major projects ka status aur submissions track kar sakte hain.";
+    } else if (/timetable|schedule|time\s*table|routine/i.test(lowerQuery)) {
+      botResponse = "Aap 'Timetables & Schedules' card par click karke weekly class schedule aur exam time tables dekh sakte hain.";
+    } else if (/co-po|pso|outcomes|course\s*outcome/i.test(lowerQuery)) {
+      botResponse = "Aap 'CO-PO & PSO Outcomes' card par click karke program framework aur course outcomes check kar sakte hain.";
+    } else if (/notice|announcement|exam|mid\s*sem|midsem|submission|date|update|नोटिस|अनाउंसमेंट|एग्जाम|मिड\s*सेम/i.test(lowerQuery)) {
+      botResponse = getNoticeFromDOM(lowerQuery) || noOfficialUpdateReply;
+    } else if (/syllabus|scheme|download|curriculum|pdf|सिलेबस|स्कीम/i.test(lowerQuery)) {
+      botResponse = "Aap 'Scheme & Syllabus' card par click karke apne branch/semester ka syllabus aur PDF files direct view/download kar sakte hain.";
+    } else if (/placement|training|job|drive|interview|प्लेसमेंट|ट्रेनिंग/i.test(lowerQuery)) {
+      botResponse = "Training & Placement hub par aapko upcoming drives, interview resources, aur placement updates ki jankari milti hai.";
+    } else if (/semester|subject|course|3rd|5th|7th|सेमेस्टर|सब्जेक्ट/i.test(lowerQuery)) {
+      botResponse = "Aap 'Semesters & Subjects' card open karke apne specific semester ke subjects aur course materials dekh sakte hain.";
+    } else {
+      botResponse = "Main JNCT AI-DS Assistant hoon. Aap portal ke Announcements, Syllabus, Timetable, Project Tracker, ya Placement ke baare mein puch sakte hain!";
+    }
+  } catch (error) {
+    console.log("AI assistant request or notice lookup failed.", error);
+    botResponse = noOfficialUpdateReply;
+  } finally {
+    document.getElementById(loadingId)?.remove();
+    aiUserInput.disabled = false;
+    aiSendButton.disabled = false;
+  }
+  const response = botResponse || noOfficialUpdateReply;
+  appendAiMessage(response, "assistant");
+  speakText(response);
+  aiUserInput.focus();
+}
+
 function semesterNumber(value) {
   const normalized = String(value || "").toLowerCase().trim();
   const match = normalized.match(/\b(?:semester|sem)\s*(\d+)\b/)
@@ -2463,10 +2717,80 @@ modal.addEventListener("click", (event) => {
 });
 document.addEventListener("keydown", (event) => {
   if (event.key === "Escape") closeModal();
+  if (event.key === "Escape" && sidebar.classList.contains("active")) {
+    sidebar.classList.remove("active");
+    document.body.classList.remove("mobile-sidebar-open");
+    mobileNavToggle.setAttribute("aria-expanded", "false");
+    mobileNavToggle.setAttribute("aria-label", "Open navigation menu");
+  }
   if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "k") {
     event.preventDefault();
     searchInput.focus();
   }
+});
+
+mobileNavToggle.addEventListener("click", () => {
+  const isOpening = !sidebar.classList.contains("active");
+  sidebar.classList.toggle("active", isOpening);
+  document.body.classList.toggle("mobile-sidebar-open", isOpening);
+  mobileNavToggle.setAttribute("aria-expanded", String(isOpening));
+  mobileNavToggle.setAttribute("aria-label", isOpening ? "Close navigation menu" : "Open navigation menu");
+});
+sidebar.querySelectorAll(".nav-link").forEach((link) => {
+  link.addEventListener("click", () => {
+    sidebar.classList.remove("active");
+    document.body.classList.remove("mobile-sidebar-open");
+    mobileNavToggle.setAttribute("aria-expanded", "false");
+    mobileNavToggle.setAttribute("aria-label", "Open navigation menu");
+  });
+});
+document.addEventListener("pointerdown", (event) => {
+  if (
+    sidebar.classList.contains("active")
+    && !sidebar.contains(event.target)
+    && !mobileNavToggle.contains(event.target)
+  ) {
+    sidebar.classList.remove("active");
+    document.body.classList.remove("mobile-sidebar-open");
+    mobileNavToggle.setAttribute("aria-expanded", "false");
+    mobileNavToggle.setAttribute("aria-label", "Open navigation menu");
+  }
+});
+
+aiToggleButton.addEventListener("click", toggleAiChat);
+aiChatWindow.querySelector(".ai-chat-close").addEventListener("click", toggleAiChat);
+aiVoiceToggle.addEventListener("click", () => {
+  aiVoiceEnabled = !aiVoiceEnabled;
+  aiVoiceToggle.setAttribute("aria-pressed", String(aiVoiceEnabled));
+  aiVoiceToggle.setAttribute("aria-label", aiVoiceEnabled ? "Mute assistant voice" : "Enable assistant voice");
+  aiVoiceToggle.title = aiVoiceEnabled ? "Mute assistant voice" : "Enable assistant voice";
+  aiVoiceToggle.innerHTML = `<i data-lucide="${aiVoiceEnabled ? "volume-2" : "volume-x"}"></i>`;
+  refreshIcons();
+  if (!aiVoiceEnabled && "speechSynthesis" in window) {
+    window.speechSynthesis.cancel();
+  }
+});
+if (micButton && speechRecognition) {
+  micButton.addEventListener("click", () => {
+    if (isListening) {
+      speechRecognition.stop();
+      return;
+    }
+
+    try {
+      speechRecognition.start();
+      isListening = true;
+      micButton.classList.add("listening");
+    } catch (error) {
+      isListening = false;
+      micButton.classList.remove("listening");
+      console.error("Could not start speech recognition.", error);
+    }
+  });
+}
+aiChatForm.addEventListener("submit", (event) => {
+  event.preventDefault();
+  sendAiMessage();
 });
 
 refreshIcons();
