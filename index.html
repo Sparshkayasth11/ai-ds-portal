@@ -117,54 +117,54 @@
           <button class="filter-tab" type="button" role="tab" aria-selected="false" data-filter="department">Department</button>
         </div>
         <div class="dashboard-grid" id="dashboard-grid">
-          <article class="dashboard-card card-announcements" data-category="department" data-search="announcements notices circulars latest news updates">
+          <article class="dashboard-card card-announcements" data-dashboard-module="announcements" data-category="department" data-search="announcements notices circulars latest news updates">
             <div class="card-topline"><span class="card-icon icon-coral"><i data-lucide="megaphone"></i></span><span class="new-badge"><i></i> <span data-announcement-badge>0 NEW</span></span></div>
             <h3>Announcements <span>&amp; Notices</span></h3><p data-announcement-preview>Stay in the loop with the latest department updates and circulars.</p><p data-announcement-error class="text-sm text-rose-600" role="status" aria-live="polite" hidden></p>
             <div class="card-bottom"><span class="card-meta"><i data-lucide="clock-3"></i> <span data-announcement-updated>No announcements yet</span></span><button class="card-arrow" type="button" aria-label="Open announcements" data-open="announcements"><i data-lucide="arrow-up-right"></i></button></div>
           </article>
 
-          <article id="learning" class="dashboard-card card-semesters" data-category="academic" data-search="semesters subject curriculum courses syllabus">
+          <article id="learning" class="dashboard-card card-semesters" data-dashboard-module="semesters" data-category="academic" data-search="semesters subject curriculum courses syllabus">
             <div class="card-topline"><span class="card-icon icon-violet"><i data-lucide="book-open"></i></span><span class="card-kicker">COURSEWORK</span></div>
             <h3>Semesters <span>&amp; Subjects</span></h3><p>Open a subject dashboard for quizzes, lab experiments, assignments, old papers, question banks, and important links.</p>
             <div class="semester-pills" id="semester-pills" aria-label="Available semesters"></div>
-            <div class="card-bottom"><span class="card-meta"><i data-lucide="layers-2"></i> <span id="semester-count">Loading semesters...</span></span><a class="card-arrow" href="https://jnct-lms-dashboard.vercel.app/#subjects" target="_blank" rel="noopener noreferrer" aria-label="Browse semesters in Student LMS Portal"><i data-lucide="arrow-up-right"></i></a></div>
+            <div class="card-bottom"><span class="card-meta"><i data-lucide="layers-2"></i> <span id="semester-count">Loading semesters...</span></span><button class="card-arrow" type="button" data-open="semesters" aria-label="Open semesters and subjects"><i data-lucide="arrow-up-right"></i></button></div>
           </article>
 
-          <article id="schedule" class="dashboard-card card-schedule" data-category="academic" data-search="timetable schedule class calendar lectures exams">
+          <article id="schedule" class="dashboard-card card-schedule" data-dashboard-module="schedule" data-category="academic" data-search="timetable schedule class calendar lectures exams">
             <div class="card-topline"><span class="card-icon icon-blue"><i data-lucide="calendar-clock"></i></span><span class="mini-date"><b>MON</b><strong>26</strong></span></div>
             <h3>Timetables <span>&amp; Schedules</span></h3><p>Plan your week. Find class, lab, and examination schedules.</p>
-            <div class="card-bottom"><span class="card-meta"><i data-lucide="calendar-check-2"></i> Semester schedules</span><a class="card-arrow" href="https://jnct-lms-dashboard.vercel.app/#schedule" target="_blank" rel="noopener noreferrer" aria-label="Open schedules in Student LMS Portal"><i data-lucide="arrow-up-right"></i></a></div>
+            <div class="card-bottom"><span class="card-meta"><i data-lucide="calendar-check-2"></i> Semester schedules</span><button class="card-arrow" type="button" data-open="schedule" aria-label="Open timetables and schedules"><i data-lucide="arrow-up-right"></i></button></div>
           </article>
 
-          <article id="projects" class="dashboard-card card-projects" data-category="student" data-search="project tracker minor major project teams progress">
+          <article id="projects" class="dashboard-card card-projects" data-dashboard-module="projects" data-category="student" data-search="project tracker minor major project teams progress">
             <div class="card-topline"><span class="card-icon icon-teal"><i data-lucide="workflow"></i></span><span class="card-kicker">BUILD SOMETHING</span></div>
             <h3>Project <span>Tracker</span></h3><p>Take your ideas from first sketch to final submission.</p>
             <div class="project-types"><span><i></i> Minor project</span><span><i></i> Major project</span></div>
-            <div class="card-bottom"><span class="card-meta"><i data-lucide="users-round"></i> Project resources</span><a class="card-arrow" href="https://jnct-lms-dashboard.vercel.app/#projects" target="_blank" rel="noopener noreferrer" aria-label="Open project tracker in Student LMS Portal"><i data-lucide="arrow-up-right"></i></a></div>
+            <div class="card-bottom"><span class="card-meta"><i data-lucide="users-round"></i> Project resources</span><button class="card-arrow" type="button" data-open="projects" aria-label="Open project tracker"><i data-lucide="arrow-up-right"></i></button></div>
           </article>
 
-          <article id="resources" class="dashboard-card card-syllabus" data-category="academic" data-search="scheme syllabus repository downloads curriculum regulations">
+          <article id="resources" class="dashboard-card card-syllabus" data-dashboard-module="syllabus" data-category="academic" data-search="scheme syllabus repository downloads curriculum regulations">
             <div class="card-topline"><span class="card-icon icon-amber"><i data-lucide="files"></i></span><span class="card-kicker">REFERENCE LIBRARY</span></div>
             <h3>Scheme <span>&amp; Syllabus</span></h3><p>Browse the academic scheme, syllabus, and course structure.</p>
             <div class="resource-file"><i data-lucide="file-text"></i><span>Scheme &amp; syllabus repository</span><i class="file-arrow" data-lucide="arrow-down-to-line"></i></div>
-            <div class="card-bottom"><span class="card-meta"><i data-lucide="archive"></i> Academic resources</span><a class="card-arrow" href="https://jnct-lms-dashboard.vercel.app/#resources" target="_blank" rel="noopener noreferrer" aria-label="Open scheme and syllabus in Student LMS Portal"><i data-lucide="arrow-up-right"></i></a></div>
+            <div class="card-bottom"><span class="card-meta"><i data-lucide="archive"></i> Academic resources</span><button class="card-arrow" type="button" data-open="syllabus" aria-label="Open scheme and syllabus"><i data-lucide="arrow-up-right"></i></button></div>
           </article>
 
-          <article id="placement" class="dashboard-card card-career" data-category="student" data-search="training placement career internship jobs t&p">
+          <article id="placement" class="dashboard-card card-career" data-dashboard-module="placement" data-category="student" data-search="training placement career internship jobs t&p">
             <div class="card-topline"><span class="card-icon icon-green"><i data-lucide="briefcase-business"></i></span><span class="card-kicker">YOUR NEXT CHAPTER</span></div>
             <h3>Training <span>&amp; Placement</span></h3><p>Discover career resources, training, and placement updates.</p>
             <div class="career-tags"><span>Career-ready</span><span>Opportunities</span><span>+ more</span></div>
-            <div class="card-bottom"><span class="card-meta"><i data-lucide="rocket"></i> T&amp;P hub</span><a class="card-arrow" href="https://jnct-lms-dashboard.vercel.app/#placement" target="_blank" rel="noopener noreferrer" aria-label="Open training and placement in Student LMS Portal"><i data-lucide="arrow-up-right"></i></a></div>
+            <div class="card-bottom"><span class="card-meta"><i data-lucide="rocket"></i> T&amp;P hub</span><button class="card-arrow" type="button" data-open="placement" aria-label="Open training and placement"><i data-lucide="arrow-up-right"></i></button></div>
           </article>
 
-          <article id="outcomes" class="dashboard-card card-outcomes" data-category="academic" data-search="co po pso outcomes framework course program specific objectives">
+          <article id="outcomes" class="dashboard-card card-outcomes" data-dashboard-module="outcomes" data-category="academic" data-search="co po pso outcomes framework course program specific objectives">
             <div class="card-topline"><span class="card-icon icon-pink"><i data-lucide="chart-no-axes-combined"></i></span><span class="card-kicker">LEARNING IMPACT</span></div>
             <h3>CO–PO <span>&amp; PSO Outcomes</span></h3><p>Explore the outcomes framework behind your learning journey.</p>
             <div class="outcome-bars" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><span>OUTCOMES FRAMEWORK</span></div>
-            <div class="card-bottom"><span class="card-meta"><i data-lucide="target"></i> Program framework</span><a class="card-arrow" href="https://jnct-lms-dashboard.vercel.app/#outcomes" target="_blank" rel="noopener noreferrer" aria-label="Open outcomes framework in Student LMS Portal"><i data-lucide="arrow-up-right"></i></a></div>
+            <div class="card-bottom"><span class="card-meta"><i data-lucide="target"></i> Program framework</span><button class="card-arrow" type="button" data-open="outcomes" aria-label="Open outcomes framework"><i data-lucide="arrow-up-right"></i></button></div>
           </article>
 
-          <article class="dashboard-card card-connect" data-category="department" data-search="external links instagram about department credits">
+          <article class="dashboard-card card-connect" data-dashboard-module="connect" data-category="department" data-search="external links instagram about department credits">
             <div class="card-topline"><span class="card-icon icon-slate"><i data-lucide="link-2"></i></span><span class="card-kicker">FIND US ONLINE</span></div>
             <h3>Connect <span>&amp; Explore</span></h3><p>A little more about our department and community.</p>
             <div class="external-links"><button type="button" data-open="connect"><i data-lucide="camera"></i> Social links <i data-lucide="arrow-up-right"></i></button><button type="button" data-open="connect"><i data-lucide="building-2"></i> Dept resources <i data-lucide="arrow-up-right"></i></button></div>

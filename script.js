@@ -118,9 +118,9 @@ const moduleDefinitions = {
     label: "Timetables & Schedules",
     icon: "calendar-clock",
     fields: [
-      { name: "batchSem", label: "Batch / Semester", required: true },
+      { name: "batchSem", label: "Batch / Semester", required: true, maxLength: 100 },
       { name: "title", label: "Title", required: true },
-      { name: "timetableLink", label: "Timetable Drive Link", type: "url", required: true }
+      { name: "timetableLink", label: "Timetable Drive Link", type: "url", required: true, googleDrive: true }
     ]
   },
   projects: {
@@ -138,8 +138,8 @@ const moduleDefinitions = {
     label: "Scheme & Syllabus",
     icon: "files",
     fields: [
-      { name: "branchSem", label: "Branch / Semester", required: true },
-      { name: "repositoryLink", label: "Repository Drive URL", type: "url", required: true }
+      { name: "branchSem", label: "Branch / Semester", required: true, maxLength: 100 },
+      { name: "repositoryLink", label: "Repository Drive URL", type: "url", required: true, googleDrive: true }
     ]
   },
   placement: {
@@ -234,6 +234,18 @@ function safeAnnouncementLink(value) {
   try {
     const url = new URL(value);
     return url.protocol === "https:" || url.protocol === "http:";
+  } catch {
+    return false;
+  }
+}
+
+function isGoogleDriveLink(value) {
+  try {
+    const url = new URL(value);
+    const hostname = url.hostname.toLowerCase();
+    return url.protocol === "https:"
+      && ["drive.google.com", "docs.google.com", "drive.usercontent.google.com"]
+        .some((host) => hostname === host || hostname.endsWith(`.${host}`));
   } catch {
     return false;
   }
@@ -533,7 +545,7 @@ function renderModuleAdminPanel(moduleKey) {
       ? `<textarea name="${field.name}" rows="3" ${field.required ? "required" : ""} maxlength="1000"></textarea>`
       : field.type === "select"
         ? `<select name="${field.name}" ${field.required ? "required" : ""}>${field.options.map((option) => `<option value="${option}">${option}</option>`).join("")}</select>`
-        : `<input name="${field.name}" type="${field.type || "text"}" ${field.required ? "required" : ""} ${field.type === "url" ? 'placeholder="https://drive.google.com/..." autocomplete="url"' : ""}>`;
+        : `<input name="${field.name}" type="${field.type || "text"}" ${field.required ? "required" : ""} ${field.maxLength ? `maxlength="${field.maxLength}"` : ""} ${field.type === "url" ? 'placeholder="https://drive.google.com/..." autocomplete="url"' : ""}>`;
     return `<label class="admin-field ${field.type === "textarea" ? "admin-field-wide" : ""}">${field.label}${control}</label>`;
   }).join("");
 
@@ -1152,6 +1164,14 @@ async function saveModuleRecord(moduleKey, form) {
     }
     if (field.type === "url" && value && !safeAnnouncementLink(value)) {
       setNoticeStatus(status, "error", `Enter a valid http:// or https:// URL for ${field.label}.`);
+      return;
+    }
+    if (field.googleDrive && value && !isGoogleDriveLink(value)) {
+      setNoticeStatus(status, "error", `Enter a valid Google Drive URL for ${field.label}.`);
+      return;
+    }
+    if (field.maxLength && value.length > field.maxLength) {
+      setNoticeStatus(status, "error", `${field.label} must be ${field.maxLength} characters or fewer.`);
       return;
     }
     record[field.name] = value;
@@ -2315,6 +2335,12 @@ document.addEventListener("click", (event) => {
 
   if (event.target.closest("[data-back-to-semesters]")) {
     renderSemesterModal(activeSemester);
+    return;
+  }
+
+  const dashboardModuleCard = event.target.closest("[data-dashboard-module]");
+  if (dashboardModuleCard && !event.target.closest("a, button")) {
+    showModal(dashboardModuleCard.dataset.dashboardModule);
     return;
   }
 

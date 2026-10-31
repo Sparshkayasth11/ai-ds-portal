@@ -132,6 +132,7 @@ button { color: inherit; }
 
 .dashboard-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 13px; }
 .dashboard-card { position: relative; min-width: 0; min-height: 214px; display: flex; flex-direction: column; overflow: hidden; padding: 15px 15px 12px; border: 1px solid #e9edf4; border-radius: 11px; background: #fff; box-shadow: 0 5px 16px #34457505; transition: transform .25s cubic-bezier(.2,.8,.2,1), box-shadow .25s ease, border-color .25s ease; animation: card-in .45s both; }
+.dashboard-card[data-dashboard-module] { cursor: pointer; }
 .dashboard-card:nth-child(2) { animation-delay: .035s; }.dashboard-card:nth-child(3) { animation-delay: .07s; }.dashboard-card:nth-child(4) { animation-delay: .105s; }.dashboard-card:nth-child(5) { animation-delay: .14s; }.dashboard-card:nth-child(6) { animation-delay: .175s; }.dashboard-card:nth-child(7) { animation-delay: .21s; }.dashboard-card:nth-child(8) { animation-delay: .245s; }
 .dashboard-card::before { position: absolute; inset: 0 0 auto; height: 2px; opacity: 0; background: linear-gradient(90deg, #6269e8, #59cdb4); content: ""; transition: opacity .25s ease; }
 .dashboard-card:hover { z-index: 1; transform: translateY(-4px); border-color: #d9dcf6; box-shadow: 0 14px 32px #35447d12; }
