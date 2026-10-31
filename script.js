@@ -322,7 +322,6 @@ async function signInFaculty(email, password, errorElement, submitButton, onSucc
 
 function handleAuthState(user) {
   if (user && !isAuthorizedFaculty(user)) {
-    adminNavLink.hidden = true;
     document.querySelector("#admin-auth-message").textContent = `Access is limited to ${authorizedFacultyEmail}.`;
     if (!adminView.hidden) showDashboardView("overview");
     firebaseAuth.signOut().catch((error) => {
@@ -331,7 +330,6 @@ function handleAuthState(user) {
     return;
   }
   adminSession = user?.email || "";
-  adminNavLink.hidden = !isAuthorizedFaculty(user);
   if (user) {
     if (!portalStructure.length) void ensureDefaultSemesters();
     document.querySelector("#admin-session-name").textContent = adminSession;
