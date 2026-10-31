@@ -66,6 +66,13 @@ button { color: inherit; }
 .login-button:hover { border-color: #444bcc; background: #444bcc; transform: translateY(-1px); box-shadow: 0 7px 14px #5b62e83a; }
 .login-button svg { width: 14px; height: 14px; }
 .login-button .login-arrow { width: 11px; height: 11px; opacity: .72; }
+.btn-lms, .btn-admin { display: inline-flex; align-items: center; gap: 8px; min-height: 36px; padding: 0 12px; border-radius: 8px; font-size: 10px; font-weight: 700; text-decoration: none; transition: .2s ease; }
+.btn-lms { border: 1px solid #2f80d8; color: #fff; background: #347fce; box-shadow: 0 4px 10px #347fce2b; }
+.btn-lms:hover { border-color: #216bb5; background: #216bb5; transform: translateY(-1px); box-shadow: 0 7px 14px #347fce3a; }
+.btn-admin { border: 1px solid #dfe4ee; color: #59667e; background: #fff; }
+.btn-admin:hover { border-color: #cfd2fa; color: #555cdb; background: #f8f8ff; transform: translateY(-1px); }
+.btn-lms svg, .btn-admin svg { width: 14px; height: 14px; }
+.btn-lms .login-arrow, .btn-admin .login-arrow { width: 11px; height: 11px; opacity: .72; }
 .mobile-brand { display: none; align-items: center; gap: 8px; }
 .mobile-brand .brand-emblem { width: 32px; height: 32px; border-radius: 10px; }
 .mobile-brand .brand-emblem span { font-size: 19px; }
@@ -279,6 +286,8 @@ body.modal-open { overflow: hidden; }
   .academic-badge svg { width: 13px; }
   .login-button { width: 35px; height: 35px; justify-content: center; padding: 0; }
   .login-button span, .login-button .login-arrow { display: none; }
+  .btn-lms, .btn-admin { min-height: 35px; padding: 0 9px; }
+  .btn-lms span, .btn-admin span, .btn-lms .login-arrow, .btn-admin .login-arrow { display: none; }
   .welcome-section { min-height: 220px; margin-top: 18px; padding: 25px 21px; }
   .welcome-copy { max-width: 100%; }
   .welcome-copy h1 { max-width: 300px; font-size: 32px; }
