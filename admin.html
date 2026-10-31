@@ -20,6 +20,9 @@
       }
     };
   </script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
   <script src="https://unpkg.com/lucide@latest"></script>
   <style>
     :root {
@@ -45,8 +48,8 @@
     .field { display: grid; gap: 7px; margin-top: 17px; color: #59667e; font-size: 11px; font-weight: 700; }
     .field input, .field select, .field textarea { width: 100%; min-height: 42px; padding: 10px 12px; border: 1px solid #e3e8f0; border-radius: 8px; outline: 0; color: #27324a; background: var(--surface); font-size: 12px; font-weight: 400; transition: .2s ease; }
     .field input:focus, .field select:focus, .field textarea:focus { border-color: #aeb3f3; box-shadow: 0 0 0 3px #656be910; }
-    .demo-notice { display: flex; align-items: flex-start; gap: 10px; margin-top: 18px; padding: 12px; border: 1px solid #f2e6c6; border-radius: 9px; color: #7a6740; background: #fffbef; font-size: 10px; line-height: 1.65; }
-    .demo-notice svg { width: 16px; height: 16px; flex: 0 0 auto; margin-top: 1px; color: #bd9146; }
+    .auth-note { display: flex; align-items: flex-start; gap: 10px; margin-top: 18px; padding: 12px; border: 1px solid #e6e9fb; border-radius: 9px; color: #63708b; background: #f7f8ff; font-size: 10px; line-height: 1.65; }
+    .auth-note svg { width: 16px; height: 16px; flex: 0 0 auto; margin-top: 1px; color: #656be9; }
     .primary-button { min-height: 40px; display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 0 15px; border: 0; border-radius: 8px; color: #fff; background: var(--brand); box-shadow: 0 4px 10px #5b62e826; font-size: 11px; font-weight: 700; transition: .2s ease; }
     .primary-button:hover { transform: translateY(-1px); background: #474ed3; }
     .primary-button svg { width: 15px; height: 15px; }
@@ -164,10 +167,10 @@
         <span><span class="brand-name">JNCT<span>.</span></span><span class="brand-subtitle">BHOPAL · AI &amp; DS</span></span>
       </a>
       <h1>Faculty portal</h1>
-      <p>Sign in to manage department notices and academic resources.</p>
+      <p>Sign in with your authorized Firebase faculty account to manage department resources.</p>
       <form id="login-form">
-        <label class="field">Employee ID
-          <input name="employeeId" autocomplete="username" placeholder="Enter your employee ID" required>
+        <label class="field">Faculty email
+          <input name="email" type="email" autocomplete="username" placeholder="name@jnctbhopal.ac.in" required>
         </label>
         <label class="field">Password
           <input name="password" type="password" autocomplete="current-password" placeholder="Enter your password" required>
@@ -175,7 +178,7 @@
         <p id="login-error" class="error-message" aria-live="polite"></p>
         <button class="primary-button" type="submit">Continue to portal <i data-lucide="arrow-right"></i></button>
       </form>
-      <div class="demo-notice"><i data-lucide="shield-alert"></i><span><strong>Static demo only.</strong> There is no authentication backend; the form accepts non-empty fields for preview only. Credentials are not checked or stored. Do not use this page to protect real admin access.</span></div>
+      <div class="auth-note"><i data-lucide="shield-check"></i><span>Credentials are verified by Firebase Authentication. Access requires an approved faculty account.</span></div>
     </div>
   </section>
 
@@ -193,8 +196,8 @@
         <button class="side-link" type="button" data-section="analytics"><i data-lucide="chart-no-axes-combined"></i>Department Analytics</button>
       </nav>
       <div class="sidebar-bottom">
-        <div class="sidebar-note"><strong>Local preview workspace</strong>Notices are stored in this browser and are visible to the student dashboard in the same browser profile.</div>
-        <div class="sidebar-foot"><span class="status-dot"></span> Portal preview <span style="margin-left:auto">2025–26</span></div>
+        <div class="sidebar-note"><strong>Live department workspace</strong>Published announcements are synchronized through Firebase Firestore.</div>
+        <div class="sidebar-foot"><span class="status-dot"></span> Firebase connected <span style="margin-left:auto">2025–26</span></div>
       </div>
     </aside>
 
@@ -204,7 +207,7 @@
         <div class="top-actions">
           <a class="outline-button" href="index.html" aria-label="Open student dashboard"><i data-lucide="external-link"></i><span>Student dashboard</span></a>
           <button id="theme-toggle" class="icon-button" type="button" aria-label="Toggle dark theme"><i data-lucide="moon"></i></button>
-          <div class="profile-chip"><span id="profile-avatar" class="avatar">FA</span><div><strong id="profile-name">Faculty</strong><small>Faculty preview</small></div></div>
+          <div class="profile-chip"><span id="profile-avatar" class="avatar">FA</span><div><strong id="profile-name">Faculty</strong><small>Firebase Authentication</small></div></div>
           <button id="logout-button" class="outline-button" type="button" aria-label="Sign out"><i data-lucide="log-out"></i><span>Sign out</span></button>
         </div>
       </header>
@@ -221,7 +224,7 @@
             <article class="stat-card"><span class="stat-icon" style="color:#3fa977;background:#edfaf3"><i data-lucide="paperclip"></i></span><div><div class="stat-label">WITH ATTACHMENTS</div><div id="stat-links" class="stat-value">0</div></div></article>
           </div>
           <section class="content-card">
-            <div class="card-header"><div><h2 id="form-heading">Quick action · Add a notice</h2><p>New notices appear in the student dashboard in this browser immediately.</p></div><button id="cancel-edit" class="outline-button hidden" type="button"><i data-lucide="x"></i><span>Cancel edit</span></button></div>
+            <div class="card-header"><div><h2 id="form-heading">Quick action · Add a notice</h2><p>Notices are published to Firestore and sync to the student dashboard.</p></div><button id="cancel-edit" class="outline-button hidden" type="button"><i data-lucide="x"></i><span>Cancel edit</span></button></div>
             <form id="notice-form" class="form-body">
               <input type="hidden" name="id">
               <div class="form-grid">
@@ -251,7 +254,7 @@
         <section class="page-section hidden" data-view="timetable">
           <div class="page-heading"><div><div class="eyebrow">ACADEMIC SCHEDULE</div><h1>Update timetable</h1><p>Keep a reference to the current schedule resource for the department.</p></div></div>
           <section class="content-card">
-            <div class="card-header"><div><h2>Timetable resource</h2><p>Saved in this browser as a local preview setting.</p></div></div>
+            <div class="card-header"><div><h2>Timetable resource</h2><p>Saved to Firestore for connected student and faculty devices.</p></div></div>
             <form id="timetable-form" class="form-body">
               <div class="form-grid">
                 <label class="field">Semester<select name="semester"><option>3rd Semester</option><option>5th Semester</option><option>7th Semester</option></select></label>
@@ -273,13 +276,13 @@
         </section>
 
         <section class="page-section hidden" data-view="analytics">
-          <div class="page-heading"><div><div class="eyebrow">DEPARTMENT OVERVIEW</div><h1>Department analytics</h1><p>A quick summary of the local portal preview data.</p></div></div>
+          <div class="page-heading"><div><div class="eyebrow">DEPARTMENT OVERVIEW</div><h1>Department analytics</h1><p>A live summary of published Firestore notices and available local project drafts.</p></div></div>
           <div class="stat-grid">
             <article class="stat-card"><span class="stat-icon"><i data-lucide="megaphone"></i></span><div><div class="stat-label">TOTAL NOTICES</div><div id="analytics-notices" class="stat-value">0</div></div></article>
             <article class="stat-card"><span class="stat-icon" style="color:#35a7bd;background:#eaf8fb"><i data-lucide="folder-kanban"></i></span><div><div class="stat-label">PROJECT DRAFTS</div><div id="analytics-projects" class="stat-value">0</div></div></article>
             <article class="stat-card"><span class="stat-icon" style="color:#3fa977;background:#edfaf3"><i data-lucide="paperclip"></i></span><div><div class="stat-label">LINKED RESOURCES</div><div id="analytics-links" class="stat-value">0</div></div></article>
           </div>
-          <section class="content-card simple-panel"><h2>About these numbers</h2><p>Analytics are calculated from notices and project drafts stored in this browser. This preview is not connected to a department server and does not combine data across users or devices.</p></section>
+          <section class="content-card simple-panel"><h2>About these numbers</h2><p>Notice and attachment counts are synchronized from Firestore. Project draft summaries remain local to this browser.</p></section>
         </section>
       </div>
     </main>
@@ -287,18 +290,42 @@
 
   <script>
     (() => {
-      const noticeKey = "jnct-ai-ds-announcements";
       const projectKey = "jnct-ai-ds-project-drafts";
-      const timetableKey = "jnct-ai-ds-timetable";
       const themeKey = "jnct-ai-ds-admin-theme";
+      const authorizedFacultyEmail = "sparshshri2003@gmail.com";
       const loginView = document.querySelector("#login-view");
       const app = document.querySelector("#admin-app");
       const noticeForm = document.querySelector("#notice-form");
       const noticeRows = document.querySelector("#notice-rows");
       const formMessage = document.querySelector("#form-message");
+      const loginForm = document.querySelector("#login-form");
+      const loginError = document.querySelector("#login-error");
       let notices = [];
       let editorName = "";
       let storageWarning = "";
+      let firebaseAuth = null;
+      let db = null;
+      let announcementSubscription = null;
+      let timetableSubscription = null;
+
+      const firebaseConfig = {
+        apiKey: "AIzaSyBxuuyR8C3qbi4WHxsjOVF6f_oZZ5A0arY",
+        authDomain: "ai-ds-portal.firebaseapp.com",
+        projectId: "ai-ds-portal",
+        messagingSenderId: "1026402710531",
+        appId: "1:1026402710531:web:dd89d3994206cea15b8a36",
+        measurementId: "G-FETNGNKNK6"
+      };
+
+      try {
+        const firebaseApp = firebase.apps.length ? firebase.app() : firebase.initializeApp(firebaseConfig);
+        firebaseAuth = firebaseApp.auth();
+        db = firebaseApp.firestore();
+      } catch (error) {
+        loginError.textContent = "Firebase could not be initialized. Check the Firebase SDK connection.";
+        loginForm.querySelector('button[type="submit"]').disabled = true;
+        console.error("Standalone admin Firebase initialization failed.", error);
+      }
 
       function iconRefresh() {
         if (window.lucide) window.lucide.createIcons();
@@ -312,25 +339,6 @@
           storageWarning = "Saved browser data could not be read. Check storage settings or clear invalid local data.";
           return fallback;
         }
-      }
-
-      function readNotices() {
-        const value = readJson(noticeKey, []);
-        if (!Array.isArray(value)) {
-          storageWarning = "Saved announcements have an invalid format and could not be shown.";
-          return [];
-        }
-        return value.filter((item) => item && typeof item.title === "string" && typeof item.body === "string")
-          .map((item) => ({
-            id: typeof item.id === "string" ? item.id : `${Date.now()}-${Math.random()}`,
-            title: item.title.slice(0, 100),
-            body: item.body.slice(0, 1000),
-            author: typeof item.author === "string" ? item.author : "Department",
-            createdAt: typeof item.createdAt === "string" ? item.createdAt : new Date().toISOString(),
-            category: ["New", "Academic", "General"].includes(item.category) ? item.category : "General",
-            date: typeof item.date === "string" ? item.date : (item.createdAt || new Date().toISOString()).slice(0, 10),
-            link: safeUrl(item.link) ? item.link : ""
-          }));
       }
 
       function safeUrl(value) {
@@ -376,7 +384,6 @@
       }
 
       function renderNotices() {
-        notices = readNotices();
         noticeRows.replaceChildren();
         if (storageWarning) {
           formMessage.className = "message error";
@@ -464,17 +471,28 @@
         document.querySelector("#cancel-edit").classList.add("hidden");
       }
 
-      function persistNotices(nextNotices) {
+      async function persistNotice(notice) {
         try {
-          localStorage.setItem(noticeKey, JSON.stringify(nextNotices));
-          notices = nextNotices;
-          renderNotices();
+          if (!firebaseAuth?.currentUser || !db) throw new Error("Sign in to publish department notices.");
+          await db.collection("announcements").doc(notice.id).set({
+            title: notice.title,
+            body: notice.body,
+            category: notice.category,
+            date: notice.date,
+            link: notice.link,
+            author: firebaseAuth.currentUser.email || "Faculty",
+            createdAt: notice.createdAt || firebase.firestore.FieldValue.serverTimestamp(),
+            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+          });
           formMessage.className = "message success";
-          formMessage.textContent = "Notice saved. The student dashboard in this browser is updated immediately.";
+          formMessage.textContent = "Notice saved and syncing to the student dashboard.";
           return true;
-        } catch {
+        } catch (error) {
           formMessage.className = "message error";
-          formMessage.textContent = "Could not save this notice. Check browser storage settings and try again.";
+          formMessage.textContent = error.code === "permission-denied"
+            ? "Firebase denied this write. Check Firestore security rules."
+            : `Could not save this notice. ${error.message || "Check your connection and try again."}`;
+          console.error("Firestore announcement save failed.", error);
           return false;
         }
       }
@@ -540,32 +558,133 @@
         document.querySelector("#breadcrumb-current").textContent = labels[section] || labels.announcements;
       }
 
+      function firebaseMessage(error) {
+        const messages = {
+          "auth/invalid-credential": "The email or password is incorrect.",
+          "auth/invalid-login-credentials": "The email or password is incorrect.",
+          "auth/user-not-found": "The email or password is incorrect.",
+          "auth/wrong-password": "The email or password is incorrect.",
+          "auth/invalid-email": "Enter a valid faculty email address.",
+          "auth/too-many-requests": "Too many sign-in attempts. Please wait and try again.",
+          "auth/network-request-failed": "Could not reach Firebase Authentication. Check your internet connection.",
+          "auth/operation-not-allowed": "Email/Password sign-in is not enabled in Firebase Authentication.",
+          "permission-denied": "Firebase denied this operation. Check Firestore security rules."
+        };
+        return messages[error?.code] || error?.message || "The request could not be completed.";
+      }
+
+      function stopAdminListeners() {
+        if (announcementSubscription) announcementSubscription();
+        if (timetableSubscription) timetableSubscription();
+        announcementSubscription = null;
+        timetableSubscription = null;
+      }
+
+      function startAdminListeners() {
+        stopAdminListeners();
+        announcementSubscription = db.collection("announcements").onSnapshot((snapshot) => {
+          notices = snapshot.docs.map((document) => {
+            const data = document.data();
+            const timestamp = data.createdAt?.toDate ? data.createdAt.toDate().toISOString() : "";
+            return {
+              ...data,
+              id: document.id,
+              title: typeof data.title === "string" ? data.title.slice(0, 100) : "",
+              body: typeof data.body === "string" ? data.body.slice(0, 1000) : "",
+              author: typeof data.author === "string" ? data.author : "Department",
+              createdAt: timestamp || (typeof data.createdAt === "string" ? data.createdAt : ""),
+              category: ["New", "Academic", "General"].includes(data.category) ? data.category : "General",
+              date: typeof data.date === "string" ? data.date : (timestamp || new Date().toISOString()).slice(0, 10),
+              link: safeUrl(data.link) ? data.link : ""
+            };
+          }).filter((notice) => notice.title && notice.body)
+            .sort((left, right) => new Date(right.createdAt || right.date) - new Date(left.createdAt || left.date));
+          formMessage.className = "message";
+          formMessage.textContent = snapshot.metadata.fromCache ? "Connecting to live Firestore data..." : "";
+          renderNotices();
+        }, (error) => {
+          formMessage.className = "message error";
+          formMessage.textContent = `Could not load announcements. ${firebaseMessage(error)}`;
+          console.error("Firestore announcement listener failed.", error);
+        });
+        timetableSubscription = db.collection("timetables").orderBy("updatedAt", "desc").onSnapshot((snapshot) => {
+          const latest = snapshot.docs[0]?.data();
+          if (!latest) return;
+          const form = document.querySelector("#timetable-form");
+          if ([...form.elements.semester.options].some((option) => option.value === latest.semester)) {
+            form.elements.semester.value = latest.semester;
+          }
+          if (latest.date) form.elements.date.value = latest.date;
+          if (safeUrl(latest.timetableLink || latest.link)) form.elements.link.value = latest.timetableLink || latest.link;
+        }, (error) => {
+          const message = document.querySelector("#timetable-message");
+          message.className = "message error";
+          message.textContent = `Could not load timetable records. ${firebaseMessage(error)}`;
+          console.error("Firestore timetable listener failed.", error);
+        });
+      }
+
       function enterPortal(name) {
         editorName = name;
         loginView.classList.add("hidden");
         app.classList.remove("hidden");
         document.querySelector("#profile-name").textContent = name;
         document.querySelector("#profile-avatar").textContent = name.split(/\s+/).map((part) => part[0]).join("").slice(0, 2).toUpperCase();
+        startAdminListeners();
         renderNotices();
         showSection("announcements");
       }
 
-      document.querySelector("#login-form").addEventListener("submit", (event) => {
+      loginForm.addEventListener("submit", async (event) => {
         event.preventDefault();
-        const form = event.currentTarget;
-        const employeeId = form.elements.employeeId.value.trim();
-        const password = form.elements.password.value;
-        if (!employeeId || !password) {
-          document.querySelector("#login-error").textContent = "Enter an Employee ID and password to continue.";
+        const email = loginForm.elements.email.value.trim().toLowerCase();
+        const password = loginForm.elements.password.value;
+        const submit = loginForm.querySelector('button[type="submit"]');
+        if (email !== authorizedFacultyEmail) {
+          loginError.textContent = `Access is limited to ${authorizedFacultyEmail}.`;
           return;
         }
-        document.querySelector("#login-error").textContent = "";
-        form.elements.password.value = "";
-        enterPortal(employeeId);
+        if (!firebaseAuth) {
+          loginError.textContent = "Firebase Authentication is unavailable. Reload the page and try again.";
+          return;
+        }
+        submit.disabled = true;
+        loginError.textContent = "";
+        try {
+          await firebaseAuth.signInWithEmailAndPassword(email, password);
+          loginForm.elements.password.value = "";
+        } catch (error) {
+          loginError.textContent = firebaseMessage(error);
+          console.error("Standalone admin sign-in failed.", error);
+        } finally {
+          submit.disabled = false;
+        }
       });
 
+      if (firebaseAuth) {
+        firebaseAuth.onAuthStateChanged((user) => {
+          if (user && user.email?.trim().toLowerCase() === authorizedFacultyEmail) {
+            loginError.textContent = "";
+            enterPortal(user.email);
+            return;
+          }
+          stopAdminListeners();
+          app.classList.add("hidden");
+          loginView.classList.remove("hidden");
+          if (user) {
+            loginError.textContent = `Access is limited to ${authorizedFacultyEmail}.`;
+            firebaseAuth.signOut().catch((error) => {
+              console.error("Unauthorized Firebase user sign-out failed.", error);
+            });
+          }
+        }, (error) => {
+          loginError.textContent = firebaseMessage(error);
+          console.error("Standalone admin auth-state listener failed.", error);
+        });
+      }
+
       noticeForm.elements.date.value = localDateValue();
-      noticeForm.addEventListener("submit", (event) => {
+      noticeForm.addEventListener("submit", async (event) => {
         event.preventDefault();
         const data = new FormData(noticeForm);
         const title = data.get("title").trim();
@@ -577,22 +696,19 @@
           formMessage.textContent = "Enter a valid http:// or https:// attachment link.";
           return;
         }
-        const existingId = data.get("id");
+        const existingId = String(data.get("id") || "");
         const previous = notices.find((item) => item.id === existingId);
         const notice = {
-          id: existingId || (typeof crypto !== "undefined" && crypto.randomUUID ? crypto.randomUUID() : `${Date.now()}-${Math.random()}`),
+          id: existingId || db.collection("announcements").doc().id,
           title,
           body,
           category: data.get("category"),
           date: data.get("date"),
           link,
-          author: editorName || "Faculty",
-          createdAt: previous?.createdAt || new Date().toISOString()
+          author: firebaseAuth.currentUser.email || editorName || "Faculty",
+          createdAt: previous?.createdAt || ""
         };
-        const next = existingId
-          ? notices.map((item) => item.id === existingId ? notice : item)
-          : [notice, ...notices];
-        if (persistNotices(next)) resetNoticeForm();
+        if (await persistNotice(notice)) resetNoticeForm();
       });
 
       document.querySelector("#cancel-edit").addEventListener("click", () => {
@@ -612,8 +728,14 @@
         const notice = notices.find((item) => item.id === remove.dataset.deleteId);
         if (!notice || !window.confirm(`Delete "${notice.title}"? This also removes it from the student dashboard.`)) return;
         if (noticeForm.elements.id.value === notice.id) resetNoticeForm();
-        persistNotices(notices.filter((item) => item.id !== notice.id));
-        formMessage.textContent = "Notice deleted.";
+        db.collection("announcements").doc(notice.id).delete().then(() => {
+          formMessage.className = "message success";
+          formMessage.textContent = "Notice deleted from the live dashboard.";
+        }).catch((error) => {
+          formMessage.className = "message error";
+          formMessage.textContent = `Could not delete notice. ${firebaseMessage(error)}`;
+          console.error("Firestore announcement deletion failed.", error);
+        });
       });
 
       document.querySelectorAll("[data-section]").forEach((button) => {
@@ -629,34 +751,40 @@
       });
 
       document.querySelector("#logout-button").addEventListener("click", () => {
-        app.classList.add("hidden");
-        loginView.classList.remove("hidden");
-        document.querySelector("#login-form").reset();
-        document.querySelector("#login-error").textContent = "";
-        editorName = "";
+        if (!firebaseAuth) return;
+        firebaseAuth.signOut().catch((error) => {
+          loginError.textContent = `Could not sign out. ${firebaseMessage(error)}`;
+          console.error("Standalone admin sign-out failed.", error);
+        });
       });
 
-      document.querySelector("#timetable-form").addEventListener("submit", (event) => {
+      document.querySelector("#timetable-form").addEventListener("submit", async (event) => {
         event.preventDefault();
         const form = event.currentTarget;
         const data = new FormData(form);
+        const message = document.querySelector("#timetable-message");
         if (!safeUrl(data.get("link"))) {
-          document.querySelector("#timetable-message").className = "message error";
-          document.querySelector("#timetable-message").textContent = "Enter a valid http:// or https:// timetable link.";
+          message.className = "message error";
+          message.textContent = "Enter a valid http:// or https:// timetable link.";
           return;
         }
         try {
-          localStorage.setItem(timetableKey, JSON.stringify({ semester: data.get("semester"), date: data.get("date"), link: data.get("link") }));
-          document.querySelector("#timetable-message").className = "message success";
-          document.querySelector("#timetable-message").textContent = "Timetable reference saved in this browser.";
-        } catch {
-          document.querySelector("#timetable-message").className = "message error";
-          document.querySelector("#timetable-message").textContent = "Could not save timetable. Check browser storage settings.";
+          if (!firebaseAuth?.currentUser) throw new Error("Sign in to update timetable resources.");
+          await db.collection("timetables").doc(`semester-${String(data.get("semester")).toLowerCase().replace(/[^a-z0-9]+/g, "-")}`).set({
+            semester: data.get("semester"),
+            date: data.get("date"),
+            title: `${data.get("semester")} timetable`,
+            timetableLink: data.get("link"),
+            author: firebaseAuth.currentUser.email,
+            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+          }, { merge: true });
+          message.className = "message success";
+          message.textContent = "Timetable reference saved and syncing to the portal.";
+        } catch (error) {
+          message.className = "message error";
+          message.textContent = `Could not save timetable. ${firebaseMessage(error)}`;
+          console.error("Firestore timetable save failed.", error);
         }
-      });
-
-      window.addEventListener("storage", (event) => {
-        if (event.key === noticeKey && !app.classList.contains("hidden")) renderNotices();
       });
 
       try {

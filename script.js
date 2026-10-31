@@ -281,6 +281,7 @@ function firebaseErrorMessage(error, action = "complete the request") {
   }
   const messages = {
     "auth/invalid-credential": "The email or password is incorrect.",
+    "auth/invalid-login-credentials": "The email or password is incorrect.",
     "auth/user-not-found": "The email or password is incorrect.",
     "auth/wrong-password": "The email or password is incorrect.",
     "auth/invalid-email": "Enter a valid faculty email address.",
@@ -295,7 +296,7 @@ function firebaseErrorMessage(error, action = "complete the request") {
 }
 
 function isAuthorizedFaculty(user = firebaseAuth?.currentUser) {
-  return String(user?.email || "").toLowerCase() === authorizedFacultyEmail;
+  return String(user?.email || "").trim().toLowerCase() === authorizedFacultyEmail;
 }
 
 async function signInFaculty(email, password, errorElement, submitButton, onSuccess = () => {}) {
@@ -303,14 +304,15 @@ async function signInFaculty(email, password, errorElement, submitButton, onSucc
     errorElement.textContent = firebaseInitializationError || "Firebase Authentication is unavailable.";
     return;
   }
-  if (email.toLowerCase() !== authorizedFacultyEmail) {
+  const normalizedEmail = String(email || "").trim().toLowerCase();
+  if (normalizedEmail !== authorizedFacultyEmail) {
     errorElement.textContent = `Only ${authorizedFacultyEmail} can access faculty management.`;
     return;
   }
   submitButton.disabled = true;
   errorElement.textContent = "";
   try {
-    await firebaseAuth.signInWithEmailAndPassword(email, password);
+    await firebaseAuth.signInWithEmailAndPassword(normalizedEmail, password);
     onSuccess();
   } catch (error) {
     errorElement.textContent = firebaseErrorMessage(error, "sign in");
