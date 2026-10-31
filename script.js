@@ -16,6 +16,7 @@ const micButton = document.querySelector("#micBtn");
 const aiVoiceToggle = document.querySelector("#ai-voice-toggle");
 const aiSendButton = document.querySelector("#ai-send-btn");
 let aiVoiceEnabled = true;
+let speechPlaybackId = 0;
 const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 let speechRecognition = null;
 let isListening = false;
@@ -1621,17 +1622,36 @@ function speakText(text) {
   const cleanText = text
     .replace(/[*_`#~>|]/g, " ")
     .replace(/[^\p{L}\p{N}\s.,!?;:।-]/gu, " ")
-    .replace(/\s+/g, " ")
+    .replace(/[ \t]+/g, " ")
+    .replace(/\n{2,}/g, "\n")
     .trim();
   if (!cleanText) return;
 
   try {
     window.speechSynthesis.cancel();
-    const utterance = new window.SpeechSynthesisUtterance(cleanText);
-    utterance.lang = "hi-IN";
-    utterance.pitch = 1.0;
-    utterance.rate = 1.0;
-    window.speechSynthesis.speak(utterance);
+    const playbackId = ++speechPlaybackId;
+    const chunks = [];
+    cleanText.split("\n").forEach((paragraph) => {
+      let remaining = paragraph.trim();
+      while (remaining.length > 220) {
+        let splitAt = remaining.lastIndexOf(" ", 220);
+        if (splitAt < 1) splitAt = 220;
+        chunks.push(remaining.slice(0, splitAt).trim());
+        remaining = remaining.slice(splitAt).trim();
+      }
+      if (remaining) chunks.push(remaining);
+    });
+
+    const speakNextChunk = (index) => {
+      if (playbackId !== speechPlaybackId || index >= chunks.length) return;
+      const utterance = new window.SpeechSynthesisUtterance(chunks[index]);
+      utterance.lang = "hi-IN";
+      utterance.pitch = 1.0;
+      utterance.rate = 1.0;
+      utterance.onend = () => speakNextChunk(index + 1);
+      window.speechSynthesis.speak(utterance);
+    };
+    speakNextChunk(0);
   } catch (error) {
     console.error("Could not speak assistant response.", error);
   }
@@ -1645,7 +1665,7 @@ function getDepartmentNoticeQueryCategory(query) {
   const normalizedQuery = normalizeNoticeText(query);
   if (/\b(mid|sem|midsem|exam|timetable|schedule)\b|time\s+table|टाइम\s*टेबल|टाइमटेबल|एग्जाम|परीक्षा|मिड\s*सेम/i.test(normalizedQuery)) return "midSem";
   if (/\b(minor|project|proect|submission)\b|प्रोजेक्ट/i.test(normalizedQuery)) return "minorProject";
-  if (/\b(notice|announcement|annoucemnt|update|naya|latest|date)\b|\bkya\s+hai\b|नोटिस|अनाउंसमेंट/i.test(normalizedQuery)) return "latest";
+  if (/\b(notices?|announcements?|annoucemnt|updates?|naya|latest|date)\b|\bkya\s+hai\b|नोटिस|अनाउंसमेंट/i.test(normalizedQuery)) return "latest";
   return "";
 }
 
@@ -1655,35 +1675,11 @@ function getNoticeFromDOM(query) {
   const queryCategory = getDepartmentNoticeQueryCategory(query);
   if (!queryCategory) return "";
 
-  const selectors = [
-    ".announcement-item",
-    ".announcement-card",
-    "[data-announcement-card]",
-    "[data-notice-card]",
-    ".card-announcements",
-    ".announcement-list > article",
-    '[class*="notice" i] article',
-    '[class*="announcement" i] article'
-  ];
-  const noticeCards = new Set(document.querySelectorAll(selectors.join(", ")));
-
-  document.querySelectorAll(
-    "#modal-content h1, #modal-content h2, #modal-content h3, " +
-    '[id*="notice" i] h1, [id*="notice" i] h2, [id*="notice" i] h3, ' +
-    '[class*="notice" i] h1, [class*="notice" i] h2, [class*="notice" i] h3, ' +
-    '[id*="announcement" i] h1, [id*="announcement" i] h2, [id*="announcement" i] h3, ' +
-    '[class*="announcement" i] h1, [class*="announcement" i] h2, [class*="announcement" i] h3'
-  ).forEach((heading) => {
-    const card = heading.closest(selectors.join(", "));
-    if (card) {
-      noticeCards.add(card);
-    } else if (heading.closest("#modal-content")) {
-      noticeCards.add(heading.parentElement);
-    }
-  });
-
-  const allNotices = [];
-  document.querySelectorAll(selectors.join(", ")).forEach((card) => noticeCards.add(card));
+  const noticeCards = document.querySelectorAll(
+    ".announcement-card, .modal-body .notice-item, .modal-content .notice-item, " +
+    ".announcement-item, [data-announcement-card], [data-notice-card], .card-announcements"
+  );
+  const noticesArray = [];
   noticeCards.forEach((card) => {
     if (!card) return;
     const isDashboardCard = card.matches(".card-announcements");
@@ -1709,13 +1705,13 @@ function getNoticeFromDOM(query) {
       ? normalize(`${title} ${description}`)
       : normalize(card.innerText || card.textContent || "");
     if (title || description) {
-      allNotices.push({ title, date, description, text, isDashboardCard });
+      noticesArray.push({ title, date, description, text, isDashboardCard });
     }
   });
 
-  let notices = allNotices;
-  if (allNotices.some((notice) => !notice.isDashboardCard)) {
-    notices = allNotices.filter((notice) => !notice.isDashboardCard);
+  let notices = noticesArray;
+  if (noticesArray.some((notice) => !notice.isDashboardCard)) {
+    notices = noticesArray.filter((notice) => !notice.isDashboardCard);
   }
   const seenNotices = new Set();
   notices = notices.filter((notice) => {
@@ -1728,14 +1724,15 @@ function getNoticeFromDOM(query) {
   if (!notices.length) return noOfficialNoticeReply;
 
   if (queryCategory === "latest") {
-    const summaries = notices.map((notice) => {
+    let responseText = "Portal par yeh naye announcements available hain:\n";
+    notices.forEach((notice, index) => {
       const heading = [notice.date, notice.title].filter(Boolean).join(" : ");
       const summary = notice.description
         ? `${heading}${heading ? " - " : ""}${notice.description}`
         : heading;
-      return `- ${summary}`;
+      if (summary.trim()) responseText += `${index + 1}. ${summary}\n`;
     });
-    return `Portal par yeh naye announcements available hain:\n${summaries.join("\n")}`;
+    return responseText.trimEnd();
   }
 
   const noticeRegex = queryCategory === "midSem"
@@ -2767,6 +2764,7 @@ aiVoiceToggle.addEventListener("click", () => {
   aiVoiceToggle.innerHTML = `<i data-lucide="${aiVoiceEnabled ? "volume-2" : "volume-x"}"></i>`;
   refreshIcons();
   if (!aiVoiceEnabled && "speechSynthesis" in window) {
+    speechPlaybackId += 1;
     window.speechSynthesis.cancel();
   }
 });
