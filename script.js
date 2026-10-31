@@ -215,7 +215,7 @@ const modalDetails = {
   privacy: {
     title: "Privacy policy",
     description: "This dashboard uses Firebase for department announcements and faculty sign-in.",
-    content: "Announcements and attachment links are read from the department's Firebase Firestore database. Faculty sign-in is handled by Firebase Authentication. Project drafts and timetable references remain local to this browser."
+    content: "Announcements, curriculum, schedules, and department resources are read from the department's Firebase Firestore database. Faculty sign-in is handled by Firebase Authentication."
   },
   guidelines: {
     title: "AI & Data Science department guidelines",
@@ -2010,14 +2010,22 @@ function renderModuleModal(moduleKey) {
   records.forEach((record) => {
     const card = document.createElement("article");
     card.className = "rounded-xl border border-slate-200 bg-white p-4 shadow-sm";
-    const primaryField = definition.fields.find((field) => field.type !== "url" && field.type !== "textarea" && field.name !== "category");
     const heading = document.createElement("h3");
     heading.className = "text-sm font-semibold text-slate-800";
-    heading.textContent = String(record[primaryField?.name] || definition.label);
+    heading.textContent = String(
+      record.title
+      || record.subjectName
+      || record.projectType
+      || record.batchSem
+      || record.branchSem
+      || record.platform
+      || definition.label
+    );
     card.append(heading);
-    definition.fields.filter((field) => field.name !== primaryField?.name).forEach((field) => {
+    definition.fields.forEach((field) => {
       const value = record[field.name];
       if (!value) return;
+      if (field.name === "title" && heading.textContent === String(value)) return;
       if (field.type === "url" && safeAnnouncementLink(value)) {
         const link = document.createElement("a");
         link.className = "mt-3 inline-flex text-sm font-semibold text-indigo-600 hover:text-indigo-800";

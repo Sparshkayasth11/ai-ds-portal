@@ -191,8 +191,13 @@
       <div class="sidebar-label">FACULTY WORKSPACE</div>
       <nav class="side-nav" aria-label="Admin sections">
         <button class="side-link active" type="button" data-section="announcements"><i data-lucide="megaphone"></i>Manage Announcements</button>
-        <button class="side-link" type="button" data-section="timetable"><i data-lucide="calendar-clock"></i>Update Timetable</button>
-        <button class="side-link" type="button" data-section="projects"><i data-lucide="folder-kanban"></i>Project Submissions</button>
+        <button class="side-link" type="button" data-section="subjects"><i data-lucide="book-open-check"></i>Semesters &amp; Subjects</button>
+        <button class="side-link" type="button" data-section="timetables"><i data-lucide="calendar-clock"></i>Timetables &amp; Schedules</button>
+        <button class="side-link" type="button" data-section="projects"><i data-lucide="folder-kanban"></i>Project Tracker</button>
+        <button class="side-link" type="button" data-section="syllabus"><i data-lucide="files"></i>Scheme &amp; Syllabus</button>
+        <button class="side-link" type="button" data-section="placement"><i data-lucide="briefcase-business"></i>Training &amp; Placement</button>
+        <button class="side-link" type="button" data-section="outcomes"><i data-lucide="chart-no-axes-combined"></i>CO-PO &amp; PSO</button>
+        <button class="side-link" type="button" data-section="connect"><i data-lucide="link-2"></i>Connect &amp; Explore</button>
         <button class="side-link" type="button" data-section="analytics"><i data-lucide="chart-no-axes-combined"></i>Department Analytics</button>
       </nav>
       <div class="sidebar-bottom">
@@ -251,38 +256,43 @@
           </section>
         </section>
 
-        <section class="page-section hidden" data-view="timetable">
-          <div class="page-heading"><div><div class="eyebrow">ACADEMIC SCHEDULE</div><h1>Update timetable</h1><p>Keep a reference to the current schedule resource for the department.</p></div></div>
-          <section class="content-card">
-            <div class="card-header"><div><h2>Timetable resource</h2><p>Saved to Firestore for connected student and faculty devices.</p></div></div>
-            <form id="timetable-form" class="form-body">
-              <div class="form-grid">
-                <label class="field">Semester<select name="semester"><option>3rd Semester</option><option>5th Semester</option><option>7th Semester</option></select></label>
-                <label class="field">Last updated<input name="date" type="date" required></label>
-                <label class="field field-wide">Timetable / Drive link<input name="link" type="url" placeholder="https://drive.google.com/..." required></label>
-              </div>
-              <p id="timetable-message" class="message" aria-live="polite"></p>
-              <div class="form-actions"><button class="primary-button" type="submit"><i data-lucide="save"></i>Save timetable reference</button></div>
-            </form>
-          </section>
+        <section class="page-section hidden" data-view="subjects">
+          <div class="page-heading"><div><div class="eyebrow">ACADEMIC CURRICULUM</div><h1>Semesters &amp; Subjects</h1><p>Manage the curriculum and subject-specific learning resources shown to students.</p></div></div>
+          <div id="module-subjects"></div>
         </section>
-
+        <section class="page-section hidden" data-view="timetables">
+          <div class="page-heading"><div><div class="eyebrow">ACADEMIC SCHEDULE</div><h1>Timetables &amp; Schedules</h1><p>Publish semester schedules and timetable links to the student dashboard.</p></div></div>
+          <div id="module-timetables"></div>
+        </section>
         <section class="page-section hidden" data-view="projects">
-          <div class="page-heading"><div><div class="eyebrow">STUDENT WORK</div><h1>Project submissions</h1><p>Review project drafts saved in this browser profile.</p></div></div>
-          <section class="content-card">
-            <div class="card-header"><div><h2>Project drafts</h2><p>These entries are local demo drafts, not centrally submitted student work.</p></div></div>
-            <div id="project-drafts" class="simple-grid" style="padding:17px"></div>
-          </section>
+          <div class="page-heading"><div><div class="eyebrow">STUDENT PROJECTS</div><h1>Project Tracker</h1><p>Manage the Minor and Major project guidelines and submission resources.</p></div></div>
+          <div id="module-projects"></div>
+        </section>
+        <section class="page-section hidden" data-view="syllabus">
+          <div class="page-heading"><div><div class="eyebrow">ACADEMIC REPOSITORY</div><h1>Scheme &amp; Syllabus</h1><p>Publish scheme and syllabus repository links for each branch or semester.</p></div></div>
+          <div id="module-syllabus"></div>
+        </section>
+        <section class="page-section hidden" data-view="placement">
+          <div class="page-heading"><div><div class="eyebrow">CAREER DEVELOPMENT</div><h1>Training &amp; Placement</h1><p>Keep training updates, placement rules, and resume resources current.</p></div></div>
+          <div id="module-placement"></div>
+        </section>
+        <section class="page-section hidden" data-view="outcomes">
+          <div class="page-heading"><div><div class="eyebrow">LEARNING IMPACT</div><h1>CO-PO &amp; PSO Outcomes</h1><p>Publish the department outcomes framework documents.</p></div></div>
+          <div id="module-outcomes"></div>
+        </section>
+        <section class="page-section hidden" data-view="connect">
+          <div class="page-heading"><div><div class="eyebrow">DEPARTMENT LINKS</div><h1>Connect &amp; Explore</h1><p>Manage social media and department resource links shown to students.</p></div></div>
+          <div id="module-connect"></div>
         </section>
 
         <section class="page-section hidden" data-view="analytics">
-          <div class="page-heading"><div><div class="eyebrow">DEPARTMENT OVERVIEW</div><h1>Department analytics</h1><p>A live summary of published Firestore notices and available local project drafts.</p></div></div>
+          <div class="page-heading"><div><div class="eyebrow">DEPARTMENT OVERVIEW</div><h1>Department analytics</h1><p>A live summary of Firestore notices, attachments, and project resources.</p></div></div>
           <div class="stat-grid">
             <article class="stat-card"><span class="stat-icon"><i data-lucide="megaphone"></i></span><div><div class="stat-label">TOTAL NOTICES</div><div id="analytics-notices" class="stat-value">0</div></div></article>
-            <article class="stat-card"><span class="stat-icon" style="color:#35a7bd;background:#eaf8fb"><i data-lucide="folder-kanban"></i></span><div><div class="stat-label">PROJECT DRAFTS</div><div id="analytics-projects" class="stat-value">0</div></div></article>
+            <article class="stat-card"><span class="stat-icon" style="color:#35a7bd;background:#eaf8fb"><i data-lucide="folder-kanban"></i></span><div><div class="stat-label">PROJECT RESOURCES</div><div id="analytics-projects" class="stat-value">0</div></div></article>
             <article class="stat-card"><span class="stat-icon" style="color:#3fa977;background:#edfaf3"><i data-lucide="paperclip"></i></span><div><div class="stat-label">LINKED RESOURCES</div><div id="analytics-links" class="stat-value">0</div></div></article>
           </div>
-          <section class="content-card simple-panel"><h2>About these numbers</h2><p>Notice and attachment counts are synchronized from Firestore. Project draft summaries remain local to this browser.</p></section>
+          <section class="content-card simple-panel"><h2>About these numbers</h2><p>Notice, attachment, and project resource counts are synchronized from Firestore.</p></section>
         </section>
       </div>
     </main>
@@ -290,7 +300,6 @@
 
   <script>
     (() => {
-      const projectKey = "jnct-ai-ds-project-drafts";
       const themeKey = "jnct-ai-ds-admin-theme";
       const authorizedFacultyEmail = "sparshshri2003@gmail.com";
       const loginView = document.querySelector("#login-view");
@@ -302,11 +311,73 @@
       const loginError = document.querySelector("#login-error");
       let notices = [];
       let editorName = "";
-      let storageWarning = "";
       let firebaseAuth = null;
       let db = null;
-      let announcementSubscription = null;
-      let timetableSubscription = null;
+      const adminSubscriptions = [];
+      const moduleRecords = {
+        subjects: [],
+        timetables: [],
+        projects: [],
+        syllabus: [],
+        placement: [],
+        outcomes: [],
+        connect: []
+      };
+      let portalStructure = [];
+      let subjectResources = [];
+
+      const moduleDefinitions = {
+        timetables: {
+          collection: "timetables",
+          label: "Timetables & Schedules",
+          fields: [
+            { name: "batchSem", label: "Batch / Semester", required: true },
+            { name: "title", label: "Title", required: true },
+            { name: "timetableLink", label: "Timetable Drive Link", type: "url", required: true }
+          ]
+        },
+        projects: {
+          collection: "projectResources",
+          label: "Project Tracker",
+          fields: [
+            { name: "projectType", label: "Project Type", type: "select", options: ["Minor", "Major"], required: true },
+            { name: "guidelinesLink", label: "Guidelines Drive Link", type: "url" },
+            { name: "submissionsLink", label: "Submissions Drive Link", type: "url" }
+          ]
+        },
+        syllabus: {
+          collection: "schemeSyllabus",
+          label: "Scheme & Syllabus",
+          fields: [
+            { name: "branchSem", label: "Branch / Semester", required: true },
+            { name: "repositoryLink", label: "Repository Drive URL", type: "url", required: true }
+          ]
+        },
+        placement: {
+          collection: "trainingPlacement",
+          label: "Training & Placement",
+          fields: [
+            { name: "trainingUpdatesLink", label: "Training Updates Drive Link", type: "url" },
+            { name: "placementRulesLink", label: "Placement Rules Drive Link", type: "url" },
+            { name: "resumeLinks", label: "Resume Links Drive URL", type: "url" }
+          ]
+        },
+        outcomes: {
+          collection: "outcomes",
+          label: "CO-PO & PSO Outcomes",
+          fields: [
+            { name: "documentLink", label: "Outcomes Document Drive Link", type: "url", required: true }
+          ]
+        },
+        connect: {
+          collection: "connectLinks",
+          label: "Connect & Explore",
+          fields: [
+            { name: "platform", label: "Social Media / Resource Name", required: true },
+            { name: "driveLink", label: "Social Media / Department Drive Link", type: "url", required: true }
+          ]
+        }
+      };
 
       const firebaseConfig = {
         apiKey: "AIzaSyBxuuyR8C3qbi4WHxsjOVF6f_oZZ5A0arY",
@@ -329,16 +400,6 @@
 
       function iconRefresh() {
         if (window.lucide) window.lucide.createIcons();
-      }
-
-      function readJson(key, fallback) {
-        try {
-          const value = JSON.parse(localStorage.getItem(key) || JSON.stringify(fallback));
-          return value;
-        } catch {
-          storageWarning = "Saved browser data could not be read. Check storage settings or clear invalid local data.";
-          return fallback;
-        }
       }
 
       function safeUrl(value) {
@@ -381,14 +442,11 @@
         document.querySelector("#stat-links").textContent = String(linkCount);
         document.querySelector("#analytics-notices").textContent = String(count);
         document.querySelector("#analytics-links").textContent = String(linkCount);
+        document.querySelector("#analytics-projects").textContent = String(moduleRecords.projects.length);
       }
 
       function renderNotices() {
         noticeRows.replaceChildren();
-        if (storageWarning) {
-          formMessage.className = "message error";
-          formMessage.textContent = storageWarning;
-        }
         if (!notices.length) {
           const row = document.createElement("tr");
           const cell = document.createElement("td");
@@ -458,7 +516,6 @@
           noticeRows.append(row);
         });
         updateMetrics();
-        renderProjectDrafts();
         iconRefresh();
       }
 
@@ -473,7 +530,7 @@
 
       async function persistNotice(notice) {
         try {
-          if (!firebaseAuth?.currentUser || !db) throw new Error("Sign in to publish department notices.");
+          if (!adminIsAuthorized() || !db) throw new Error("Sign in with the authorized faculty account to publish department notices.");
           await db.collection("announcements").doc(notice.id).set({
             title: notice.title,
             body: notice.body,
@@ -513,48 +570,20 @@
         noticeForm.elements.title.focus();
       }
 
-      function renderProjectDrafts() {
-        const container = document.querySelector("#project-drafts");
-        const drafts = readJson(projectKey, {});
-        if (!drafts || typeof drafts !== "object" || Array.isArray(drafts)) {
-          container.textContent = "No project drafts found in this browser.";
-          document.querySelector("#analytics-projects").textContent = "0";
-          return;
-        }
-        const types = ["minor", "major"].filter((type) => drafts[type] && typeof drafts[type] === "object");
-        document.querySelector("#analytics-projects").textContent = String(types.length);
-        container.replaceChildren();
-        if (!types.length) {
-          container.textContent = "No project drafts found in this browser.";
-          return;
-        }
-        types.forEach((type) => {
-          const draft = drafts[type];
-          const card = document.createElement("article");
-          card.className = "content-card simple-panel";
-          const heading = document.createElement("h2");
-          heading.textContent = `${type === "minor" ? "Minor" : "Major"} project`;
-          const details = document.createElement("p");
-          const team = Array.isArray(draft.members) ? draft.members.filter(Boolean).join(", ") : "No team members entered";
-          details.textContent = `${draft.title || "Untitled draft"} · ${draft.status || "Status not set"} · Guide: ${draft.guide || "Not entered"} · Team: ${team || "Not entered"}`;
-          card.append(heading, details);
-          if (safeUrl(draft.repository)) {
-            const link = document.createElement("a");
-            link.href = draft.repository;
-            link.target = "_blank";
-            link.rel = "noopener noreferrer";
-            link.className = "attachment-link";
-            link.textContent = "Open repository";
-            card.append(link);
-          }
-          container.append(card);
-        });
-      }
-
       function showSection(section) {
         document.querySelectorAll("[data-view]").forEach((view) => view.classList.toggle("hidden", view.dataset.view !== section));
         document.querySelectorAll("[data-section]").forEach((button) => button.classList.toggle("active", button.dataset.section === section));
-        const labels = { announcements: "Manage announcements", timetable: "Update timetable", projects: "Project submissions", analytics: "Department analytics" };
+        const labels = {
+          announcements: "Manage announcements",
+          subjects: "Semesters & Subjects",
+          timetables: "Timetables & Schedules",
+          projects: "Project Tracker",
+          syllabus: "Scheme & Syllabus",
+          placement: "Training & Placement",
+          outcomes: "CO-PO & PSO Outcomes",
+          connect: "Connect & Explore",
+          analytics: "Department analytics"
+        };
         document.querySelector("#breadcrumb-current").textContent = labels[section] || labels.announcements;
       }
 
@@ -574,15 +603,307 @@
       }
 
       function stopAdminListeners() {
-        if (announcementSubscription) announcementSubscription();
-        if (timetableSubscription) timetableSubscription();
-        announcementSubscription = null;
-        timetableSubscription = null;
+        adminSubscriptions.splice(0).forEach((unsubscribe) => unsubscribe());
+      }
+
+      function renderModulePanel(moduleKey) {
+        const definition = moduleDefinitions[moduleKey];
+        const container = document.querySelector(`#module-${moduleKey}`);
+        if (!definition || !container) return;
+        const fields = definition.fields.map((field) => {
+          const label = document.createElement("label");
+          label.className = `field${field.type === "textarea" ? " field-wide" : ""}`;
+          label.append(document.createTextNode(field.label));
+          let input;
+          if (field.type === "select") {
+            input = document.createElement("select");
+            field.options.forEach((option) => {
+              const optionElement = document.createElement("option");
+              optionElement.value = option;
+              optionElement.textContent = option;
+              input.append(optionElement);
+            });
+          } else if (field.type === "textarea") {
+            input = document.createElement("textarea");
+            input.rows = 3;
+            input.maxLength = 1000;
+          } else {
+            input = document.createElement("input");
+            input.type = field.type || "text";
+            if (field.type === "url") input.placeholder = "https://drive.google.com/...";
+            input.maxLength = field.type === "url" ? 2048 : 254;
+          }
+          input.name = field.name;
+          input.required = Boolean(field.required);
+          label.append(input);
+          return label;
+        });
+
+        const card = document.createElement("section");
+        card.className = "content-card";
+        card.innerHTML = `<div class="card-header"><div><h2>Publish ${definition.label}</h2><p>Published records sync to the student dashboard through Firestore.</p></div></div>`;
+        const form = document.createElement("form");
+        form.className = "form-body module-form";
+        form.dataset.moduleForm = moduleKey;
+        const id = document.createElement("input");
+        id.type = "hidden";
+        id.name = "id";
+        const grid = document.createElement("div");
+        grid.className = "form-grid";
+        fields.forEach((field) => grid.append(field));
+        const message = document.createElement("p");
+        message.className = "message";
+        message.dataset.moduleMessage = moduleKey;
+        message.setAttribute("aria-live", "polite");
+        const actions = document.createElement("div");
+        actions.className = "form-actions";
+        actions.innerHTML = `<button class="primary-button" type="submit"><i data-lucide="send"></i><span data-module-submit="${moduleKey}">Publish</span></button><button class="outline-button hidden" type="button" data-module-cancel="${moduleKey}">Cancel edit</button>`;
+        form.append(id, grid, message, actions);
+        card.append(form);
+
+        const recordsCard = document.createElement("section");
+        recordsCard.className = "content-card";
+        recordsCard.style.marginTop = "15px";
+        recordsCard.innerHTML = `<div class="card-header"><div><h2>Published ${definition.label}</h2><p>Edit or remove items currently available to students.</p></div></div>`;
+        const list = document.createElement("div");
+        list.className = "simple-grid";
+        list.style.padding = "17px";
+        list.dataset.moduleList = moduleKey;
+        recordsCard.append(list);
+        container.replaceChildren(card, recordsCard);
+        iconRefresh();
+        renderModuleList(moduleKey);
+      }
+
+      function renderSubjectsPanel() {
+        const container = document.querySelector("#module-subjects");
+        if (!container) return;
+        container.innerHTML = `
+          <section class="content-card">
+            <div class="card-header"><div><h2>Manage semesters &amp; subjects</h2><p>Curriculum structure and subject mentor details sync to student dashboards.</p></div></div>
+            <form class="form-body module-form" id="semester-create-form">
+              <div class="form-grid"><label class="field">New semester name<input name="semesterName" maxlength="60" placeholder="e.g. 8th Sem" required></label></div>
+              <div class="form-actions"><button class="primary-button" type="submit"><i data-lucide="plus"></i>Add semester</button></div>
+            </form>
+            <form class="form-body module-form" id="subject-create-form">
+              <div class="form-grid">
+                <label class="field">Semester<select name="semester" required></select></label>
+                <label class="field">Subject name<input name="subjectName" maxlength="100" placeholder="e.g. AD502 Machine Learning" required></label>
+                <label class="field">Faculty / Mentor Name<input name="facultyName" maxlength="100"></label>
+                <label class="field">Contact Number<input name="contactNumber" type="tel" maxlength="30"></label>
+                <label class="field">Faculty Email Address<input name="facultyEmail" type="email" maxlength="254"></label>
+                <label class="field field-wide">Subject Description / General Information<textarea name="subjectDescription" maxlength="1000" rows="3"></textarea></label>
+              </div>
+              <p id="structure-message" class="message" aria-live="polite"></p>
+              <div class="form-actions"><button class="primary-button" type="submit"><i data-lucide="book-plus"></i>Add subject</button></div>
+            </form>
+            <div id="structure-groups" class="simple-grid" style="padding:17px"></div>
+          </section>
+          <section class="content-card" style="margin-top:15px">
+            <div class="card-header"><div><h2>Subject learning materials</h2><p>Add syllabus, unit notes, assignments, quizzes, labs, old papers, question banks, and links.</p></div></div>
+            <form class="form-body module-form" id="subject-resource-form">
+              <div class="form-grid">
+                <label class="field">Semester<select name="semester" required></select></label>
+                <label class="field">Subject<select name="subjectName" required></select></label>
+                <label class="field">Category<select name="category" required>
+                  <option>Syllabus</option><option>Subject Notes</option><option>Assignments</option><option>Quizzes</option>
+                  <option>Lab Experiments</option><option>MST Old Papers</option><option>Question Bank</option>
+                  <option>RGPV Old Papers</option><option>Important Links</option>
+                </select></label>
+                <label class="field">Resource title / unit / deadline<input name="title" maxlength="120" placeholder="e.g. Unit 1 Notes" required></label>
+                <label class="field">Assignment deadline <span style="font-weight:400;color:#929caf">(optional)</span><input name="deadline" type="date"></label>
+                <label class="field field-wide">Google Drive URL / PDF Link<input name="url" type="url" placeholder="https://drive.google.com/..." required></label>
+              </div>
+              <p id="resource-message" class="message" aria-live="polite"></p>
+              <div class="form-actions"><button class="primary-button" type="submit"><i data-lucide="save"></i>Publish resource</button></div>
+            </form>
+            <div id="subject-resource-list" class="simple-grid" style="padding:17px"></div>
+          </section>`;
+        refreshStructureControls();
+        renderStructureList();
+        renderSubjectResourceList();
+        iconRefresh();
+      }
+
+      function refreshStructureControls() {
+        const subjectSemester = document.querySelector("#subject-create-form [name='semester']");
+        const resourceSemester = document.querySelector("#subject-resource-form [name='semester']");
+        if (!subjectSemester || !resourceSemester) return;
+        const priorSubjectSemester = subjectSemester.value;
+        const priorResourceSemester = resourceSemester.value;
+        [subjectSemester, resourceSemester].forEach((select) => {
+          select.replaceChildren();
+          portalStructure.forEach((record) => {
+            const option = document.createElement("option");
+            option.value = record.semesterName;
+            option.textContent = record.semesterName;
+            select.append(option);
+          });
+          if (!portalStructure.length) {
+            const option = document.createElement("option");
+            option.value = "";
+            option.textContent = "Add a semester first";
+            select.append(option);
+          }
+        });
+        subjectSemester.value = portalStructure.some((item) => item.semesterName === priorSubjectSemester)
+          ? priorSubjectSemester : portalStructure[0]?.semesterName || "";
+        resourceSemester.value = portalStructure.some((item) => item.semesterName === priorResourceSemester)
+          ? priorResourceSemester : portalStructure[0]?.semesterName || "";
+        refreshSubjectOptions();
+      }
+
+      function refreshSubjectOptions() {
+        const form = document.querySelector("#subject-resource-form");
+        const select = form?.elements.subjectName;
+        if (!select) return;
+        const semester = form.elements.semester.value;
+        const names = portalStructure.find((item) => item.semesterName === semester)?.subjects || [];
+        const current = select.value;
+        select.replaceChildren();
+        names.forEach((name) => {
+          const option = document.createElement("option");
+          option.value = name;
+          option.textContent = name;
+          select.append(option);
+        });
+        if (!names.length) {
+          const option = document.createElement("option");
+          option.value = "";
+          option.textContent = "Add a subject first";
+          select.append(option);
+        }
+        if (names.includes(current)) select.value = current;
+      }
+
+      function renderStructureList() {
+        const container = document.querySelector("#structure-groups");
+        if (!container) return;
+        container.replaceChildren();
+        if (!portalStructure.length) {
+          const empty = document.createElement("p");
+          empty.className = "empty-row";
+          empty.textContent = "No semesters are published yet.";
+          container.append(empty);
+        }
+        portalStructure.forEach((semester) => {
+          const card = document.createElement("article");
+          card.className = "content-card simple-panel";
+          const heading = document.createElement("h2");
+          heading.textContent = semester.semesterName;
+          const subjects = document.createElement("p");
+          subjects.textContent = semester.subjects.length ? semester.subjects.join(" · ") : "No subjects added yet.";
+          card.append(heading, subjects);
+          container.append(card);
+        });
+      }
+
+      function renderSubjectResourceList() {
+        const container = document.querySelector("#subject-resource-list");
+        if (!container) return;
+        const form = document.querySelector("#subject-resource-form");
+        const semester = form?.elements.semester.value;
+        const subject = form?.elements.subjectName.value;
+        const records = subjectResources.filter((item) => item.semester === semester && item.subjectName === subject);
+        container.replaceChildren();
+        if (!records.length) {
+          const empty = document.createElement("p");
+          empty.className = "empty-row";
+          empty.textContent = "No resources published for this subject yet.";
+          container.append(empty);
+          return;
+        }
+        records.forEach((record) => {
+          const card = document.createElement("article");
+          card.className = "content-card simple-panel";
+          const heading = document.createElement("h2");
+          heading.textContent = `${record.category}: ${record.title}`;
+          const link = document.createElement("a");
+          link.className = "attachment-link";
+          link.href = record.url;
+          link.target = "_blank";
+          link.rel = "noopener noreferrer";
+          link.textContent = "Open published link";
+          const remove = document.createElement("button");
+          remove.type = "button";
+          remove.className = "row-action delete";
+          remove.dataset.deleteResource = record.id;
+          remove.setAttribute("aria-label", `Delete ${record.title}`);
+          remove.innerHTML = '<i data-lucide="trash-2"></i>';
+          card.append(heading, link, remove);
+          if (record.deadline) {
+            const deadline = document.createElement("p");
+            deadline.textContent = `Deadline: ${prettyDate(record.deadline)}`;
+            card.append(deadline);
+          }
+          container.append(card);
+        });
+        iconRefresh();
+      }
+
+      function renderModuleList(moduleKey) {
+        const container = document.querySelector(`[data-module-list="${moduleKey}"]`);
+        const definition = moduleDefinitions[moduleKey];
+        if (!container || !definition) return;
+        container.replaceChildren();
+        const records = moduleRecords[moduleKey] || [];
+        if (!records.length) {
+          const empty = document.createElement("p");
+          empty.className = "empty-row";
+          empty.textContent = `No ${definition.label.toLowerCase()} resources published yet.`;
+          container.append(empty);
+          return;
+        }
+        records.forEach((record) => {
+          const card = document.createElement("article");
+          card.className = "content-card simple-panel";
+          const heading = document.createElement("h2");
+          const primary = definition.fields.find((field) => field.type !== "url");
+          heading.textContent = String(record[primary?.name] || definition.label);
+          card.append(heading);
+          definition.fields.forEach((field) => {
+            const value = String(record[field.name] || "");
+            if (!value || field.name === primary?.name) return;
+            if (field.type === "url" && safeUrl(value)) {
+              const link = document.createElement("a");
+              link.className = "attachment-link";
+              link.href = value;
+              link.target = "_blank";
+              link.rel = "noopener noreferrer";
+              link.textContent = `Open ${field.label}`;
+              card.append(link);
+            } else {
+              const detail = document.createElement("p");
+              detail.textContent = `${field.label}: ${value}`;
+              card.append(detail);
+            }
+          });
+          const actions = document.createElement("div");
+          actions.className = "row-actions";
+          const edit = document.createElement("button");
+          edit.type = "button";
+          edit.className = "row-action";
+          edit.dataset.editModule = moduleKey;
+          edit.dataset.recordId = record.id;
+          edit.setAttribute("aria-label", `Edit ${heading.textContent}`);
+          edit.innerHTML = '<i data-lucide="pencil"></i>';
+          const remove = document.createElement("button");
+          remove.type = "button";
+          remove.className = "row-action delete";
+          remove.dataset.deleteModule = moduleKey;
+          remove.dataset.recordId = record.id;
+          remove.setAttribute("aria-label", `Delete ${heading.textContent}`);
+          remove.innerHTML = '<i data-lucide="trash-2"></i>';
+          actions.append(edit, remove);
+          card.append(actions);
+          container.append(card);
+        });
+        iconRefresh();
       }
 
       function startAdminListeners() {
         stopAdminListeners();
-        announcementSubscription = db.collection("announcements").onSnapshot((snapshot) => {
+        adminSubscriptions.push(db.collection("announcements").onSnapshot((snapshot) => {
           notices = snapshot.docs.map((document) => {
             const data = document.data();
             const timestamp = data.createdAt?.toDate ? data.createdAt.toDate().toISOString() : "";
@@ -606,22 +927,50 @@
           formMessage.className = "message error";
           formMessage.textContent = `Could not load announcements. ${firebaseMessage(error)}`;
           console.error("Firestore announcement listener failed.", error);
+        }));
+        Object.entries(moduleDefinitions).forEach(([key, definition]) => {
+          adminSubscriptions.push(db.collection(definition.collection).onSnapshot((snapshot) => {
+            moduleRecords[key] = snapshot.docs.map((document) => ({ ...document.data(), id: document.id }));
+            renderModuleList(key);
+            if (key === "projects") updateMetrics();
+          }, (error) => {
+            const container = document.querySelector(`[data-module-list="${key}"]`);
+            if (container) container.textContent = `Could not load ${definition.label.toLowerCase()}. ${firebaseMessage(error)}`;
+            console.error(`Firestore ${key} listener failed.`, error);
+          }));
         });
-        timetableSubscription = db.collection("timetables").orderBy("updatedAt", "desc").onSnapshot((snapshot) => {
-          const latest = snapshot.docs[0]?.data();
-          if (!latest) return;
-          const form = document.querySelector("#timetable-form");
-          if ([...form.elements.semester.options].some((option) => option.value === latest.semester)) {
-            form.elements.semester.value = latest.semester;
-          }
-          if (latest.date) form.elements.date.value = latest.date;
-          if (safeUrl(latest.timetableLink || latest.link)) form.elements.link.value = latest.timetableLink || latest.link;
+        adminSubscriptions.push(db.collection("portalStructure").onSnapshot((snapshot) => {
+          portalStructure = snapshot.docs.map((document) => {
+            const data = document.data();
+            return {
+              id: document.id,
+              semesterName: typeof data.semesterName === "string" ? data.semesterName.trim() : "",
+              subjects: Array.isArray(data.subjects) ? data.subjects.filter((name) => typeof name === "string").map((name) => name.trim()).filter(Boolean) : []
+            };
+          }).filter((record) => record.semesterName);
+          refreshStructureControls();
+          renderStructureList();
+          renderSubjectResourceList();
         }, (error) => {
-          const message = document.querySelector("#timetable-message");
-          message.className = "message error";
-          message.textContent = `Could not load timetable records. ${firebaseMessage(error)}`;
-          console.error("Firestore timetable listener failed.", error);
-        });
+          const status = document.querySelector("#structure-message");
+          if (status) {
+            status.className = "message error";
+            status.textContent = `Could not load semester structure. ${firebaseMessage(error)}`;
+          }
+          console.error("Firestore semester structure listener failed.", error);
+        }));
+        adminSubscriptions.push(db.collection("subjectResources").onSnapshot((snapshot) => {
+          subjectResources = snapshot.docs.map((document) => ({ ...document.data(), id: document.id }))
+            .filter((record) => safeUrl(record.url));
+          renderSubjectResourceList();
+        }, (error) => {
+          const status = document.querySelector("#resource-message");
+          if (status) {
+            status.className = "message error";
+            status.textContent = `Could not load subject resources. ${firebaseMessage(error)}`;
+          }
+          console.error("Firestore subject resource listener failed.", error);
+        }));
       }
 
       function enterPortal(name) {
@@ -630,9 +979,242 @@
         app.classList.remove("hidden");
         document.querySelector("#profile-name").textContent = name;
         document.querySelector("#profile-avatar").textContent = name.split(/\s+/).map((part) => part[0]).join("").slice(0, 2).toUpperCase();
+        renderSubjectsPanel();
+        Object.keys(moduleDefinitions).forEach(renderModulePanel);
         startAdminListeners();
         renderNotices();
         showSection("announcements");
+      }
+
+      function adminIsAuthorized() {
+        return String(firebaseAuth?.currentUser?.email || "").trim().toLowerCase() === authorizedFacultyEmail;
+      }
+
+      function showModuleMessage(moduleKey, type, text) {
+        const status = document.querySelector(`[data-module-message="${moduleKey}"]`);
+        if (!status) return;
+        status.className = `message ${type || ""}`.trim();
+        status.textContent = text;
+      }
+
+      async function saveModuleForm(form) {
+        const moduleKey = form.dataset.moduleForm;
+        const definition = moduleDefinitions[moduleKey];
+        if (!definition) return;
+        if (!adminIsAuthorized()) {
+          showModuleMessage(moduleKey, "error", "Sign in with an authorized faculty account before saving.");
+          return;
+        }
+        const data = new FormData(form);
+        const record = {};
+        for (const field of definition.fields) {
+          const value = String(data.get(field.name) || "").trim();
+          if (field.required && !value) {
+            showModuleMessage(moduleKey, "error", `${field.label} is required.`);
+            return;
+          }
+          if (field.type === "url" && value && !safeUrl(value)) {
+            showModuleMessage(moduleKey, "error", `Enter a valid http:// or https:// URL for ${field.label}.`);
+            return;
+          }
+          record[field.name] = value;
+        }
+        const id = String(data.get("id") || "");
+        const previous = (moduleRecords[moduleKey] || []).find((item) => item.id === id);
+        const button = form.querySelector('button[type="submit"]');
+        button.disabled = true;
+        showModuleMessage(moduleKey, "", "Saving to Firestore...");
+        try {
+          const collection = db.collection(definition.collection);
+          const reference = id ? collection.doc(id) : collection.doc();
+          await reference.set({
+            ...record,
+            author: firebaseAuth.currentUser.email,
+            createdAt: previous?.createdAt || firebase.firestore.FieldValue.serverTimestamp(),
+            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+          });
+          form.reset();
+          form.elements.id.value = "";
+          document.querySelector(`[data-module-submit="${moduleKey}"]`).textContent = "Publish";
+          document.querySelector(`[data-module-cancel="${moduleKey}"]`).classList.add("hidden");
+          showModuleMessage(moduleKey, "success", "Saved and syncing to student dashboards.");
+        } catch (error) {
+          showModuleMessage(moduleKey, "error", `Could not save ${definition.label.toLowerCase()}. ${firebaseMessage(error)}`);
+          console.error(`Firestore ${moduleKey} save failed.`, error);
+        } finally {
+          button.disabled = false;
+        }
+      }
+
+      async function createSemester(form) {
+        const semesterName = String(new FormData(form).get("semesterName") || "").trim();
+        const status = document.querySelector("#structure-message");
+        if (!adminIsAuthorized()) {
+          status.className = "message error";
+          status.textContent = "Sign in with an authorized faculty account before saving.";
+          return;
+        }
+        if (!semesterName) return;
+        if (portalStructure.some((item) => item.semesterName.toLowerCase() === semesterName.toLowerCase())) {
+          status.className = "message error";
+          status.textContent = "That semester already exists.";
+          return;
+        }
+        const normalized = semesterName.toLowerCase().replace(/[^a-z0-9]+/g, "");
+        const reference = db.collection("portalStructure").doc(`semester-${normalized}`);
+        const button = form.querySelector('button[type="submit"]');
+        button.disabled = true;
+        try {
+          await db.runTransaction(async (transaction) => {
+            const current = await transaction.get(reference);
+            if (current.exists) throw new Error("That semester already exists.");
+            transaction.set(reference, {
+              semesterName,
+              subjects: [],
+              author: firebaseAuth.currentUser.email,
+              createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+              updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+            });
+          });
+          form.reset();
+          status.className = "message success";
+          status.textContent = `${semesterName} added to the student curriculum.`;
+        } catch (error) {
+          status.className = "message error";
+          status.textContent = `Could not add semester. ${firebaseMessage(error)}`;
+          console.error("Firestore semester creation failed.", error);
+        } finally {
+          button.disabled = false;
+        }
+      }
+
+      async function createSubject(form) {
+        const data = new FormData(form);
+        const semesterName = String(data.get("semester") || "").trim();
+        const subjectName = String(data.get("subjectName") || "").trim();
+        const status = document.querySelector("#structure-message");
+        const semester = portalStructure.find((item) => item.semesterName === semesterName);
+        if (!adminIsAuthorized()) {
+          status.className = "message error";
+          status.textContent = "Sign in with an authorized faculty account before saving.";
+          return;
+        }
+        if (!semester || !subjectName) {
+          status.className = "message error";
+          status.textContent = "Choose a semester and enter a subject name.";
+          return;
+        }
+        const facultyEmail = String(data.get("facultyEmail") || "").trim();
+        if (facultyEmail && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(facultyEmail)) {
+          status.className = "message error";
+          status.textContent = "Enter a valid faculty email address.";
+          return;
+        }
+        if (semester.subjects.some((name) => name.toLowerCase() === subjectName.toLowerCase())) {
+          status.className = "message error";
+          status.textContent = `${subjectName} already exists under ${semesterName}.`;
+          return;
+        }
+        const metadata = moduleRecords.subjects.find((item) =>
+          item.semester === semesterName && String(item.subjectName || "").toLowerCase() === subjectName.toLowerCase()
+        );
+        const semesterRef = db.collection("portalStructure").doc(semester.id);
+        const subjectRef = metadata
+          ? db.collection("subjects").doc(metadata.id)
+          : db.collection("subjects").doc();
+        const button = form.querySelector('button[type="submit"]');
+        button.disabled = true;
+        status.className = "message";
+        status.textContent = "Saving subject to Firestore...";
+        try {
+          await db.runTransaction(async (transaction) => {
+            const current = await transaction.get(semesterRef);
+            if (!current.exists) throw new Error("The selected semester no longer exists. Refresh and try again.");
+            const currentData = current.data();
+            const currentSubjects = Array.isArray(currentData.subjects) ? currentData.subjects : [];
+            if (currentSubjects.some((name) => String(name).toLowerCase() === subjectName.toLowerCase())) {
+              throw new Error(`${subjectName} already exists under ${semesterName}.`);
+            }
+            transaction.update(semesterRef, {
+              subjects: [...currentSubjects, subjectName],
+              updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+            });
+            transaction.set(subjectRef, {
+              semester: semesterName,
+              subjectName,
+              facultyName: String(data.get("facultyName") || "").trim(),
+              contactNumber: String(data.get("contactNumber") || "").trim(),
+              facultyEmail,
+              subjectDescription: String(data.get("subjectDescription") || "").trim(),
+              author: firebaseAuth.currentUser.email,
+              ...(!metadata ? { createdAt: firebase.firestore.FieldValue.serverTimestamp() } : {}),
+              updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+            }, { merge: true });
+          });
+          const selectedSemester = semesterName;
+          form.reset();
+          form.elements.semester.value = selectedSemester;
+          status.className = "message success";
+          status.textContent = `${subjectName} added under ${semesterName}.`;
+        } catch (error) {
+          status.className = "message error";
+          status.textContent = `Could not save subject. ${firebaseMessage(error)}`;
+          console.error("Firestore subject creation failed.", error);
+        } finally {
+          button.disabled = false;
+        }
+      }
+
+      async function saveSubjectResource(form) {
+        const data = new FormData(form);
+        const semester = String(data.get("semester") || "");
+        const subjectName = String(data.get("subjectName") || "");
+        const category = String(data.get("category") || "");
+        const title = String(data.get("title") || "").trim();
+        const deadline = String(data.get("deadline") || "");
+        const url = String(data.get("url") || "").trim();
+        const status = document.querySelector("#resource-message");
+        if (!adminIsAuthorized()) {
+          status.className = "message error";
+          status.textContent = "Sign in with an authorized faculty account before saving.";
+          return;
+        }
+        if (!portalStructure.some((record) => record.semesterName === semester && record.subjects.includes(subjectName))) {
+          status.className = "message error";
+          status.textContent = "Select a subject published under the selected semester.";
+          return;
+        }
+        if (!title || !safeUrl(url)) {
+          status.className = "message error";
+          status.textContent = "Enter a resource title and valid http:// or https:// URL.";
+          return;
+        }
+        const button = form.querySelector('button[type="submit"]');
+        button.disabled = true;
+        try {
+          await db.collection("subjectResources").add({
+            semester,
+            subjectName,
+            category,
+            title,
+            deadline: category === "Assignments" ? deadline : "",
+            url,
+            author: firebaseAuth.currentUser.email,
+            createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+          });
+          form.elements.title.value = "";
+          form.elements.url.value = "";
+          form.elements.deadline.value = "";
+          status.className = "message success";
+          status.textContent = `${title} published and syncing to the student subject dashboard.`;
+        } catch (error) {
+          status.className = "message error";
+          status.textContent = `Could not save subject resource. ${firebaseMessage(error)}`;
+          console.error("Firestore subject resource save failed.", error);
+        } finally {
+          button.disabled = false;
+        }
       }
 
       loginForm.addEventListener("submit", async (event) => {
@@ -727,6 +1309,11 @@
         if (!remove) return;
         const notice = notices.find((item) => item.id === remove.dataset.deleteId);
         if (!notice || !window.confirm(`Delete "${notice.title}"? This also removes it from the student dashboard.`)) return;
+        if (!adminIsAuthorized()) {
+          formMessage.className = "message error";
+          formMessage.textContent = "Sign in with the authorized faculty account before deleting notices.";
+          return;
+        }
         if (noticeForm.elements.id.value === notice.id) resetNoticeForm();
         db.collection("announcements").doc(notice.id).delete().then(() => {
           formMessage.className = "message success";
@@ -740,6 +1327,95 @@
 
       document.querySelectorAll("[data-section]").forEach((button) => {
         button.addEventListener("click", () => showSection(button.dataset.section));
+      });
+
+      document.addEventListener("submit", (event) => {
+        const form = event.target;
+        if (form.id === "semester-create-form") {
+          event.preventDefault();
+          void createSemester(form);
+          return;
+        }
+        if (form.id === "subject-create-form") {
+          event.preventDefault();
+          void createSubject(form);
+          return;
+        }
+        if (form.id === "subject-resource-form") {
+          event.preventDefault();
+          void saveSubjectResource(form);
+          return;
+        }
+        if (form.matches("[data-module-form]")) {
+          event.preventDefault();
+          void saveModuleForm(form);
+        }
+      });
+
+      document.addEventListener("change", (event) => {
+        if (event.target.matches("#subject-resource-form [name='semester']")) {
+          refreshSubjectOptions();
+          renderSubjectResourceList();
+        } else if (event.target.matches("#subject-resource-form [name='subjectName']")) {
+          renderSubjectResourceList();
+        }
+      });
+
+      document.addEventListener("click", async (event) => {
+        const edit = event.target.closest("[data-edit-module]");
+        if (edit) {
+          const key = edit.dataset.editModule;
+          const record = moduleRecords[key]?.find((item) => item.id === edit.dataset.recordId);
+          const form = document.querySelector(`[data-module-form="${key}"]`);
+          if (!record || !form) return;
+          form.elements.id.value = record.id;
+          moduleDefinitions[key].fields.forEach((field) => {
+            form.elements[field.name].value = record[field.name] || "";
+          });
+          document.querySelector(`[data-module-submit="${key}"]`).textContent = "Save changes";
+          document.querySelector(`[data-module-cancel="${key}"]`).classList.remove("hidden");
+          form.scrollIntoView({ behavior: "smooth", block: "start" });
+          return;
+        }
+        const cancel = event.target.closest("[data-module-cancel]");
+        if (cancel) {
+          const key = cancel.dataset.moduleCancel;
+          const form = document.querySelector(`[data-module-form="${key}"]`);
+          form?.reset();
+          if (form) form.elements.id.value = "";
+          document.querySelector(`[data-module-submit="${key}"]`).textContent = "Publish";
+          cancel.classList.add("hidden");
+          showModuleMessage(key, "", "");
+          return;
+        }
+        const removeModule = event.target.closest("[data-delete-module]");
+        if (removeModule) {
+          const key = removeModule.dataset.deleteModule;
+          const record = moduleRecords[key]?.find((item) => item.id === removeModule.dataset.recordId);
+          if (!record || !adminIsAuthorized() || !window.confirm("Delete this published resource from the student portal?")) return;
+          try {
+            await db.collection(moduleDefinitions[key].collection).doc(record.id).delete();
+          } catch (error) {
+            showModuleMessage(key, "error", `Could not delete resource. ${firebaseMessage(error)}`);
+            console.error(`Firestore ${key} deletion failed.`, error);
+          }
+          return;
+        }
+        const removeResource = event.target.closest("[data-delete-resource]");
+        if (removeResource) {
+          if (!adminIsAuthorized() || !window.confirm("Delete this subject resource from the student dashboard?")) return;
+          try {
+            await db.collection("subjectResources").doc(removeResource.dataset.deleteResource).delete();
+            const status = document.querySelector("#resource-message");
+            status.className = "message success";
+            status.textContent = "Subject resource deleted.";
+          } catch (error) {
+            const status = document.querySelector("#resource-message");
+            status.className = "message error";
+            status.textContent = `Could not delete subject resource. ${firebaseMessage(error)}`;
+            console.error("Firestore subject resource deletion failed.", error);
+          }
+        }
       });
 
       document.querySelector("#theme-toggle").addEventListener("click", () => {
@@ -756,35 +1432,6 @@
           loginError.textContent = `Could not sign out. ${firebaseMessage(error)}`;
           console.error("Standalone admin sign-out failed.", error);
         });
-      });
-
-      document.querySelector("#timetable-form").addEventListener("submit", async (event) => {
-        event.preventDefault();
-        const form = event.currentTarget;
-        const data = new FormData(form);
-        const message = document.querySelector("#timetable-message");
-        if (!safeUrl(data.get("link"))) {
-          message.className = "message error";
-          message.textContent = "Enter a valid http:// or https:// timetable link.";
-          return;
-        }
-        try {
-          if (!firebaseAuth?.currentUser) throw new Error("Sign in to update timetable resources.");
-          await db.collection("timetables").doc(`semester-${String(data.get("semester")).toLowerCase().replace(/[^a-z0-9]+/g, "-")}`).set({
-            semester: data.get("semester"),
-            date: data.get("date"),
-            title: `${data.get("semester")} timetable`,
-            timetableLink: data.get("link"),
-            author: firebaseAuth.currentUser.email,
-            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-          }, { merge: true });
-          message.className = "message success";
-          message.textContent = "Timetable reference saved and syncing to the portal.";
-        } catch (error) {
-          message.className = "message error";
-          message.textContent = `Could not save timetable. ${firebaseMessage(error)}`;
-          console.error("Firestore timetable save failed.", error);
-        }
       });
 
       try {
