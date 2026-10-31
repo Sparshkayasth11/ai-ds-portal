@@ -1657,65 +1657,66 @@ function speakText(text) {
   }
 }
 
-function normalizeNoticeText(value) {
-  return value.toLowerCase().replace(/[^a-z0-9\u0900-\u097f]+/g, " ").trim();
-}
-
-function getDepartmentNoticeQueryCategory(query) {
-  const normalizedQuery = normalizeNoticeText(query);
-  if (/\b(mid|sem|midsem|exam|timetable|schedule)\b|time\s+table|टाइम\s*टेबल|टाइमटेबल|एग्जाम|परीक्षा|मिड\s*सेम/i.test(normalizedQuery)) return "midSem";
-  if (/\b(minor|project|proect|submission)\b|प्रोजेक्ट/i.test(normalizedQuery)) return "minorProject";
-  if (/\b(notices?|announcements?|annoucemnt|updates?|naya|latest|date)\b|\bkya\s+hai\b|नोटिस|अनाउंसमेंट/i.test(normalizedQuery)) return "latest";
-  return "";
-}
-
-function getNoticeFromDOM(query) {
+function getNoticeFromDOM() {
   const noOfficialNoticeReply = "Abhi iska koi official notice available nahi hai. Portal check karte rahein!";
-  const normalize = normalizeNoticeText;
-  const queryCategory = getDepartmentNoticeQueryCategory(query);
-  if (!queryCategory) return "";
-
-  const noticeCards = document.querySelectorAll(
-    ".announcement-card, .modal-body .notice-item, .modal-content .notice-item, " +
-    ".announcement-item, [data-announcement-card], [data-notice-card], .card-announcements"
-  );
   const noticesArray = [];
-  noticeCards.forEach((card) => {
-    if (!card) return;
-    const isDashboardCard = card.matches(".card-announcements");
-    const title = isDashboardCard
-      ? card.dataset.announcementTitle || ""
-      : card.dataset.announcementTitle
-        || card.dataset.noticeTitle
-        || card.querySelector("h1, h2, h3, [data-announcement-title], [data-notice-title]")?.textContent.trim()
-        || "";
-    const date = isDashboardCard
-      ? card.dataset.announcementDate || ""
-      : card.dataset.announcementDate
-        || card.dataset.noticeDate
-        || card.querySelector("time, .announcement-item-meta span, [data-announcement-date], [data-notice-date]")?.textContent.trim()
-        || "";
-    const description = isDashboardCard
-      ? card.dataset.announcementDescription || ""
-      : card.dataset.announcementDescription
-        || card.dataset.noticeDescription
-        || card.querySelector(".announcement-item > p, [data-announcement-description], [data-notice-description], p")?.textContent.trim()
-        || "";
-    const text = isDashboardCard
-      ? normalize(`${title} ${description}`)
-      : normalize(card.innerText || card.textContent || "");
-    if (title || description) {
-      noticesArray.push({ title, date, description, text, isDashboardCard });
-    }
-  });
+  const normalize = (value) => String(value || "").trim();
+  const globalAnnouncements = typeof announcements !== "undefined" && Array.isArray(announcements) && announcements.length
+    ? announcements
+    : Array.isArray(window.announcementsData) && window.announcementsData.length
+      ? window.announcementsData
+      : Array.isArray(window.announcementsList) && window.announcementsList.length
+        ? window.announcementsList
+        : null;
 
-  let notices = noticesArray;
-  if (noticesArray.some((notice) => !notice.isDashboardCard)) {
-    notices = noticesArray.filter((notice) => !notice.isDashboardCard);
+  if (globalAnnouncements) {
+    globalAnnouncements.forEach((announcement) => {
+      const rawDate = announcement.date || announcement.createdAt || "";
+      const date = rawDate ? formatAnnouncementDate(rawDate) : "";
+      const title = normalize(announcement.title);
+      const description = normalize(announcement.body || announcement.description || announcement.detail);
+      if (title || description) noticesArray.push({ title, date, description });
+    });
+  } else {
+    const itemSelector = [
+      ".announcement-card",
+      ".modal-body .notice-item",
+      ".modal-content .notice-item",
+      ".announcement-item",
+      "[data-announcement-id]",
+      "[data-announcement-card]",
+      "[data-notice-card]",
+      ".announcement-list-item"
+    ].join(", ");
+    let cards = [...document.querySelectorAll(itemSelector)];
+    if (!cards.length) {
+      cards = [...document.querySelectorAll('[class*="announcement"], [class*="notice"]')]
+        .filter((element) => element.querySelector("h1, h2, h3, time, p"));
+    }
+
+    cards.forEach((card) => {
+      const title = normalize(
+        card.dataset.announcementTitle
+        || card.dataset.noticeTitle
+        || card.querySelector("h1, h2, h3, [data-announcement-title], [data-notice-title]")?.textContent
+      );
+      const date = normalize(
+        card.dataset.announcementDate
+        || card.dataset.noticeDate
+        || card.querySelector("time, .announcement-item-meta span, [data-announcement-date], [data-notice-date]")?.textContent
+      );
+      const description = normalize(
+        card.dataset.announcementDescription
+        || card.dataset.noticeDescription
+        || card.querySelector(".announcement-item > p, [data-announcement-description], [data-notice-description], p")?.textContent
+      );
+      if (title || date || description) noticesArray.push({ title, date, description });
+    });
   }
+
   const seenNotices = new Set();
-  notices = notices.filter((notice) => {
-    const key = `${notice.date}|${notice.title}|${notice.description}`;
+  const notices = noticesArray.filter((notice) => {
+    const key = `${notice.date}|${notice.title}|${notice.description}`.toLowerCase();
     if (seenNotices.has(key)) return false;
     seenNotices.add(key);
     return true;
@@ -1723,32 +1724,15 @@ function getNoticeFromDOM(query) {
 
   if (!notices.length) return noOfficialNoticeReply;
 
-  if (queryCategory === "latest") {
-    let responseText = "Portal par yeh naye announcements available hain:\n";
-    notices.forEach((notice, index) => {
-      const heading = [notice.date, notice.title].filter(Boolean).join(" : ");
-      const summary = notice.description
-        ? `${heading}${heading ? " - " : ""}${notice.description}`
-        : heading;
-      if (summary.trim()) responseText += `${index + 1}. ${summary}\n`;
-    });
-    return responseText.trimEnd();
-  }
-
-  const noticeRegex = queryCategory === "midSem"
-    ? /mid\s*sem|timetable|schedule|exam|टाइम\s*टेबल|टाइमटेबल|एग्जाम|परीक्षा|मिड\s*सेम/i
-    : /minor\s+project|प्रोजेक्ट/i;
-  const matchingNotice = notices.find((notice) => {
-    const noticeText = normalize(`${notice.title} ${notice.description} ${notice.text}`);
-    return noticeRegex.test(noticeText);
+  let responseText = "Portal par yeh naye announcements available hain:\n";
+  notices.forEach((notice, index) => {
+    const heading = [notice.date, notice.title].filter(Boolean).join(" : ");
+    const summary = notice.description
+      ? `${heading}${heading ? " - " : ""}${notice.description}`
+      : heading;
+    if (summary.trim()) responseText += `${index + 1}. ${summary}\n`;
   });
-
-  if (!matchingNotice) return noOfficialNoticeReply;
-  return [
-    matchingNotice.date,
-    matchingNotice.title,
-    matchingNotice.description
-  ].filter(Boolean).join("\n");
+  return responseText.trimEnd();
 }
 
 async function sendAiMessage() {
@@ -1776,7 +1760,7 @@ async function sendAiMessage() {
     } else if (/co-po|pso|outcomes|course\s*outcome/i.test(lowerQuery)) {
       botResponse = "Aap 'CO-PO & PSO Outcomes' card par click karke program framework aur course outcomes check kar sakte hain.";
     } else if (/notice|announcement|exam|mid\s*sem|midsem|submission|date|update|नोटिस|अनाउंसमेंट|एग्जाम|मिड\s*सेम/i.test(lowerQuery)) {
-      botResponse = getNoticeFromDOM(lowerQuery) || noOfficialUpdateReply;
+      botResponse = getNoticeFromDOM() || noOfficialUpdateReply;
     } else if (/syllabus|scheme|download|curriculum|pdf|सिलेबस|स्कीम/i.test(lowerQuery)) {
       botResponse = "Aap 'Scheme & Syllabus' card par click karke apne branch/semester ka syllabus aur PDF files direct view/download kar sakte hain.";
     } else if (/placement|training|job|drive|interview|प्लेसमेंट|ट्रेनिंग/i.test(lowerQuery)) {
