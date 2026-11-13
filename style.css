@@ -116,6 +116,11 @@ button { color: inherit; }
 .section-heading { display: flex; align-items: end; justify-content: space-between; gap: 20px; }
 .section-eyebrow { margin-bottom: 7px; font-size: 8px; }
 .section-heading h2 { margin: 0; font-family: "Manrope", sans-serif; font-size: 21px; font-weight: 700; letter-spacing: -.7px; }
+.section-title-row { display: flex; align-items: center; gap: 10px; }
+.section-filter-reset { display: inline-flex; align-items: center; gap: 5px; padding: 4px 7px; border: 1px solid #e6e8fa; border-radius: 6px; color: #5b62d8; background: #f7f7ff; font-size: 8px; font-weight: 600; cursor: pointer; }
+.section-filter-reset[hidden] { display: none; }
+.section-filter-reset span:first-child { color: #8992a6; font-weight: 500; }
+.section-filter-reset:hover { border-color: #cfd2fa; background: #f0f1ff; }
 .section-heading p { margin: 5px 0 0; color: #8792a6; font-size: 10px; }
 .search-box { width: 230px; height: 37px; display: flex; align-items: center; gap: 8px; padding: 0 9px; border: 1px solid #e6eaf2; border-radius: 8px; background: #fff; transition: border .2s ease, box-shadow .2s ease; }
 .search-box:focus-within { border-color: #aeb3f3; box-shadow: 0 0 0 3px #656be90d; }

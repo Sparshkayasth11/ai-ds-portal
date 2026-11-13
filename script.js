@@ -47,6 +47,8 @@ if (SpeechRecognition && micButton) {
 const searchInput = document.querySelector("#dashboard-search");
 const cards = [...document.querySelectorAll(".dashboard-card")];
 const filterTabs = [...document.querySelectorAll(".filter-tab")];
+const showAllCardsButton = document.querySelector("#show-all-cards");
+const activeSectionLabel = document.querySelector("#active-section-label");
 const emptyState = document.querySelector("#empty-state");
 const announcementCard = document.querySelector(".card-announcements");
 const announcementCount = document.querySelector("[data-announcement-count]");
@@ -83,6 +85,7 @@ try {
   console.error(firebaseInitializationError, error);
 }
 let activeFilter = "all";
+let activeSection = "overview";
 let lastFocusedElement = null;
 let activeSemester = "";
 let announcements = [];
@@ -2397,24 +2400,54 @@ function closeModal() {
 
 function filterCards() {
   const query = searchInput.value.trim().toLocaleLowerCase();
+  const allowedCardIds = {
+    "#learning": ["learning", "resources"],
+    "#schedule": ["schedule"],
+    "#projects": ["projects"],
+    "#resources": ["connect"],
+    "#placement": ["placement"],
+    "#outcomes": ["outcomes"]
+  }[activeSection];
   let visibleCount = 0;
 
   cards.forEach((card) => {
     const categoryMatches = activeFilter === "all" || card.dataset.category === activeFilter;
+    const sectionMatches = !allowedCardIds || allowedCardIds.includes(card.id);
     const searchText = `${card.dataset.search || ""} ${card.textContent}`.toLocaleLowerCase();
     const queryMatches = !query || searchText.includes(query);
-    const isVisible = categoryMatches && queryMatches;
+    const isVisible = sectionMatches && categoryMatches && queryMatches;
     card.hidden = !isVisible;
     if (isVisible) visibleCount += 1;
   });
 
+  const selectedNavItem = sidebar.querySelector(`.nav-link[href="${activeSection}"]`);
+  showAllCardsButton.hidden = !allowedCardIds;
+  activeSectionLabel.textContent = selectedNavItem ? `Showing: ${selectedNavItem.dataset.nav} ·` : "";
   emptyState.hidden = visibleCount > 0;
+}
+
+function updateFilterTabs() {
+  filterTabs.forEach((tab) => {
+    const isActive = tab.dataset.filter === activeFilter;
+    tab.classList.toggle("active", isActive);
+    tab.setAttribute("aria-selected", String(isActive));
+  });
 }
 
 document.addEventListener("click", (event) => {
   const dashboardNavItem = event.target.closest(".nav-link[data-nav]");
   if (dashboardNavItem) {
+    event.preventDefault();
+    activeSection = dashboardNavItem.getAttribute("href") === "#home"
+      ? "overview"
+      : dashboardNavItem.getAttribute("href");
+    activeFilter = "all";
+    searchInput.value = "";
+    updateFilterTabs();
+    filterCards();
     showDashboardView("overview", dashboardNavItem);
+    document.querySelector(activeSection === "overview" ? "#home" : ".dashboard-section")
+      .scrollIntoView({ behavior: "smooth", block: "start" });
     return;
   }
 
@@ -2651,11 +2684,9 @@ document.addEventListener("change", (event) => {
 filterTabs.forEach((tab) => {
   tab.addEventListener("click", () => {
     activeFilter = tab.dataset.filter;
-    filterTabs.forEach((item) => {
-      const isActive = item === tab;
-      item.classList.toggle("active", isActive);
-      item.setAttribute("aria-selected", String(isActive));
-    });
+    activeSection = "overview";
+    updateFilterTabs();
+    showDashboardView("overview", sidebar.querySelector('[data-nav="Overview"]'));
     filterCards();
   });
 });
@@ -2664,13 +2695,20 @@ searchInput.addEventListener("input", filterCards);
 document.querySelector("#clear-search").addEventListener("click", () => {
   searchInput.value = "";
   activeFilter = "all";
-  filterTabs.forEach((tab) => {
-    const isActive = tab.dataset.filter === "all";
-    tab.classList.toggle("active", isActive);
-    tab.setAttribute("aria-selected", String(isActive));
-  });
+  activeSection = "overview";
+  updateFilterTabs();
+  showDashboardView("overview", sidebar.querySelector('[data-nav="Overview"]'));
   filterCards();
   searchInput.focus();
+});
+
+showAllCardsButton.addEventListener("click", () => {
+  activeSection = "overview";
+  activeFilter = "all";
+  searchInput.value = "";
+  updateFilterTabs();
+  showDashboardView("overview", sidebar.querySelector('[data-nav="Overview"]'));
+  filterCards();
 });
 
 document.querySelector("#admin-sign-out").addEventListener("click", () => {
