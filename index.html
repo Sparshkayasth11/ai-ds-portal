@@ -78,6 +78,22 @@
         <div class="top-actions">
           <span class="academic-badge"><i data-lucide="calendar-range"></i> Academic year <strong>2025–26</strong></span>
           <button class="icon-button notification-button" type="button" aria-label="View notifications" data-open="announcements"><i data-lucide="bell"></i><span class="notification-dot"></span></button>
+          <div class="theme-customizer">
+            <button id="theme-toggle" class="icon-button theme-toggle" type="button" aria-label="Open theme customizer" aria-expanded="false" aria-controls="theme-panel"><i data-lucide="palette"></i></button>
+            <section id="theme-panel" class="theme-panel" aria-label="Theme and accent customizer" hidden>
+              <div class="theme-panel-heading"><div><strong>Make it yours</strong><small>Theme &amp; accent</small></div><button id="theme-panel-close" class="theme-panel-close" type="button" aria-label="Close theme customizer"><i data-lucide="x"></i></button></div>
+              <div class="theme-swatches" role="group" aria-label="Choose a theme">
+                <button class="theme-swatch" type="button" data-theme-preset="default" aria-label="Default Indigo theme" aria-pressed="false" title="Default Indigo"><span style="--swatch-color:#5b62e8"></span><small>Indigo</small></button>
+                <button class="theme-swatch" type="button" data-theme-preset="midnight" aria-label="Midnight theme" aria-pressed="false" title="Midnight"><span style="--swatch-color:#3979ee"></span><small>Midnight</small></button>
+                <button class="theme-swatch" type="button" data-theme-preset="bloom" aria-label="Bloom theme" aria-pressed="false" title="Bloom"><span style="--swatch-color:#e35d83"></span><small>Bloom</small></button>
+                <button class="theme-swatch" type="button" data-theme-preset="emerald" aria-label="Emerald theme" aria-pressed="false" title="Emerald"><span style="--swatch-color:#19a88a"></span><small>Emerald</small></button>
+                <button class="theme-swatch" type="button" data-theme-preset="linen" aria-label="Linen theme" aria-pressed="false" title="Linen"><span style="--swatch-color:#bd813b"></span><small>Linen</small></button>
+              </div>
+              <label class="custom-accent-toggle"><input id="custom-accent-enabled" type="checkbox"><span>Custom accent</span></label>
+              <label class="custom-accent-control" for="custom-accent-hue"><span>Accent hue</span><input id="custom-accent-hue" type="range" min="0" max="359" value="240" aria-label="Custom accent hue"></label>
+              <div class="theme-current-label" id="theme-current-label" aria-live="polite">Default Indigo</div>
+            </section>
+          </div>
           <a class="btn-lms" href="https://jnct-lms-dashboard.vercel.app" target="_blank" rel="noopener noreferrer"><i data-lucide="graduation-cap"></i><span>Student LMS Portal</span><i class="login-arrow" data-lucide="arrow-up-right"></i></a>
           <a class="btn-admin" href="admin.html" aria-label="Open Dashboard Handler"><i data-lucide="shield-check"></i><span>Dashboard Handler</span><i class="login-arrow" data-lucide="arrow-up-right"></i></a>
         </div>

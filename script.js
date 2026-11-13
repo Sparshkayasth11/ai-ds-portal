@@ -49,6 +49,14 @@ const cards = [...document.querySelectorAll(".dashboard-card")];
 const filterTabs = [...document.querySelectorAll(".filter-tab")];
 const showAllCardsButton = document.querySelector("#show-all-cards");
 const activeSectionLabel = document.querySelector("#active-section-label");
+const themeCustomizer = document.querySelector(".theme-customizer");
+const themeToggle = document.querySelector("#theme-toggle");
+const themePanel = document.querySelector("#theme-panel");
+const themePanelClose = document.querySelector("#theme-panel-close");
+const themeSwatches = [...document.querySelectorAll("[data-theme-preset]")];
+const customAccentEnabled = document.querySelector("#custom-accent-enabled");
+const customAccentHue = document.querySelector("#custom-accent-hue");
+const themeCurrentLabel = document.querySelector("#theme-current-label");
 const emptyState = document.querySelector("#empty-state");
 const announcementCard = document.querySelector(".card-announcements");
 const announcementCount = document.querySelector("[data-announcement-count]");
@@ -86,6 +94,16 @@ try {
 }
 let activeFilter = "all";
 let activeSection = "overview";
+const themeLabels = {
+  default: "Default Indigo",
+  midnight: "Midnight",
+  bloom: "Bloom",
+  emerald: "Emerald",
+  linen: "Linen",
+  custom: "Custom Accent"
+};
+let customHue = 240;
+let previousTheme = "default";
 let lastFocusedElement = null;
 let activeSemester = "";
 let announcements = [];
@@ -2398,6 +2416,41 @@ function closeModal() {
   if (lastFocusedElement instanceof HTMLElement) lastFocusedElement.focus();
 }
 
+function applyTheme(theme, hue = customHue, persist = true) {
+  const validTheme = Object.hasOwn(themeLabels, theme) ? theme : "default";
+  customHue = Number.isFinite(hue) ? Math.min(359, Math.max(0, Math.round(hue))) : 240;
+  document.documentElement.dataset.theme = validTheme;
+  document.documentElement.style.setProperty("--custom-hue", String(customHue));
+  customAccentHue.value = String(customHue);
+  customAccentEnabled.checked = validTheme === "custom";
+  customAccentHue.disabled = !customAccentEnabled.checked;
+  themeCurrentLabel.textContent = validTheme === "custom" ? `Custom Accent · ${customHue}°` : themeLabels[validTheme];
+  themeSwatches.forEach((swatch) => {
+    swatch.setAttribute("aria-pressed", String(swatch.dataset.themePreset === validTheme));
+  });
+  if (validTheme !== "custom") previousTheme = validTheme;
+
+  if (persist) {
+    try {
+      localStorage.setItem("ai-ds-theme", JSON.stringify({ theme: validTheme, hue: customHue }));
+    } catch (error) {
+      console.error("Could not save theme preferences to local storage.", error);
+    }
+  }
+}
+
+function initializeTheme() {
+  try {
+    const savedTheme = JSON.parse(localStorage.getItem("ai-ds-theme") || "{}") || {};
+    applyTheme(savedTheme.theme || "default", savedTheme.hue ?? 240, false);
+  } catch (error) {
+    console.error("Could not load theme preferences from local storage.", error);
+    applyTheme("default", 240, false);
+  }
+}
+
+initializeTheme();
+
 function filterCards() {
   const query = searchInput.value.trim().toLocaleLowerCase();
   const allowedCardIds = {
@@ -2689,6 +2742,48 @@ filterTabs.forEach((tab) => {
     showDashboardView("overview", sidebar.querySelector('[data-nav="Overview"]'));
     filterCards();
   });
+});
+
+themeToggle.addEventListener("click", () => {
+  const isOpening = themePanel.hidden;
+  themePanel.hidden = !isOpening;
+  themeToggle.setAttribute("aria-expanded", String(isOpening));
+  themeToggle.setAttribute("aria-label", isOpening ? "Close theme customizer" : "Open theme customizer");
+});
+
+themePanelClose.addEventListener("click", () => {
+  themePanel.hidden = true;
+  themeToggle.setAttribute("aria-expanded", "false");
+  themeToggle.setAttribute("aria-label", "Open theme customizer");
+  themeToggle.focus();
+});
+
+themeSwatches.forEach((swatch) => {
+  swatch.addEventListener("click", () => applyTheme(swatch.dataset.themePreset));
+});
+
+customAccentEnabled.addEventListener("change", () => {
+  applyTheme(customAccentEnabled.checked ? "custom" : previousTheme);
+});
+
+customAccentHue.addEventListener("input", () => {
+  applyTheme("custom", Number(customAccentHue.value));
+});
+
+document.addEventListener("click", (event) => {
+  if (!themeCustomizer.contains(event.target) && !themePanel.hidden) {
+    themePanel.hidden = true;
+    themeToggle.setAttribute("aria-expanded", "false");
+    themeToggle.setAttribute("aria-label", "Open theme customizer");
+  }
+});
+
+document.addEventListener("keydown", (event) => {
+  if (event.key === "Escape" && !themePanel.hidden) {
+    themePanel.hidden = true;
+    themeToggle.setAttribute("aria-expanded", "false");
+    themeToggle.setAttribute("aria-label", "Open theme customizer");
+  }
 });
 
 searchInput.addEventListener("input", filterCards);
